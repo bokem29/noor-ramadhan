@@ -14,12 +14,18 @@ npm install -D tailwindcss
 ```
 
 ### 3. Kompilasi Tailwind CSS
-Untuk memproses file CSS dan menerapkan perubahan gaya ke `output.css`, jalankan perintah CLI berikut:
+Karena proyek ini sudah menyediakan *scripts* bawaan di dalam `package.json`, Anda tidak perlu mengetik perintah yang panjang. 
 
+Untuk memproses file CSS sekali jalan (Build), jalankan:
 ```bash
-npx tailwindcss -i ./src/input.css -o ./src/output.css --watch
+npm run build:css
 ```
-> **Tip:** Gunakan flag `--watch` agar Tailwind otomatis mendeteksi setiap perubahan yang Anda simpan di file HTML atau CSS.
+
+**Development Mode (Disarankan)**
+Agar Tailwind otomatis mendeteksi setiap kali Anda menyimpan file HTML/CSS dan langsung memperbarui `output.css`, biarkan proses ini berjalan di terminal:
+```bash
+npm run watch:css
+```
 
 ### 4. Membuka Proyek
 Cukup buka file `index.html` langsung di browser Anda atau gunakan ekstensi **Live Server** di VS Code.

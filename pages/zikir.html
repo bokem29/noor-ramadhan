@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="../public/assets/images/logo.png" type="image/x-icon">
+    <title>Zikir Counter | Noor Ramadhan</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <!-- Google Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+        rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <link href="../src/output.css" rel="stylesheet">
+    <style>
+        /* Hidden scrollbar */
+        body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            overscroll-behavior: none;
+            /* Prevent pull-to-refresh on mobile */
+        }
+
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Material Icon Alignment Fix */
+        .material-symbols-outlined {
+            align-items: center;
+            justify-content: center;
+            font-size: 24px !important;
+            line-height: 1 !important;
+        }
+
+        /* Ripple Effect */
+        .omni-ripple {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0) 70%);
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease-out;
+            z-index: 10;
+        }
+
+        /* Number Animation */
+        @keyframes calmFocus {
+            0% {
+                opacity: 0.5;
+                filter: blur(6px);
+                transform: translateY(10px) scale(0.98);
+                color: #D4AF37;
+            }
+
+            100% {
+                opacity: 1;
+                filter: blur(0);
+                transform: translateY(0) scale(1);
+                color: #FFFFFF;
+            }
+        }
+
+        .anim-calm {
+            animation: calmFocus 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        /* Particle Animation */
+        @keyframes fallThread {
+            0% {
+                offset-distance: 0%;
+                opacity: 0;
+                transform: scale(0.5);
+            }
+
+            10% {
+                opacity: 1;
+                transform: scale(1);
+                filter: drop-shadow(0 0 10px #D4AF37);
+            }
+
+            90% {
+                opacity: 1;
+                filter: drop-shadow(0 0 5px #D4AF37);
+            }
+
+            100% {
+                offset-distance: 100%;
+                opacity: 0;
+                transform: scale(0.5);
+            }
+        }
+
+        .anim-thread-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: #D4AF37;
+            border-radius: 50%;
+            offset-path: path('M 50 0 C 200 300, -100 700, 50 1000');
+            animation: fallThread 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Background Parallax */
+        .parallax-bg {
+            transition: transform 0.1s ease-out;
+        }
+
+        /* Active target state */
+        .target-active {
+            background-color: #D4AF37 !important;
+            color: #1B4332 !important;
+            border-color: #D4AF37 !important;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2) !important;
+        }
+
+        /* Celebration Animations */
+        @keyframes fadeUpCinematic {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+                filter: blur(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        .celeb-active {
+            pointer-events: auto !important;
+            opacity: 1 !important;
+            backdrop-filter: blur(20px);
+            cursor: default !important;
+        }
+
+        .celeb-closing {
+            opacity: 0 !important;
+            backdrop-filter: blur(0px);
+            transition: all 0.3s ease-in-out;
+            pointer-events: none !important;
+        }
+
+        .celeb-text-1 {
+            opacity: 0;
+        }
+
+        .celeb-active .celeb-text-1 {
+            animation: fadeUpCinematic 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+        }
+
+        .celeb-text-2 {
+            opacity: 0;
+        }
+
+        .celeb-active .celeb-text-2 {
+            animation: fadeUpCinematic 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+        }
+
+        .celeb-btn {
+            opacity: 0;
+        }
+
+        .celeb-active .celeb-btn {
+            animation: fadeUpCinematic 1s cubic-bezier(0.16, 1, 0.3, 1) 1.2s forwards;
+        }
+
+        /* Bloom Animation */
+        @keyframes mandalaBloom {
+            0% {
+                transform: scale(0.5) rotate(0deg);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1) rotate(45deg);
+                opacity: 0.15;
+            }
+        }
+
+        .anim-mandala {
+            animation: mandalaBloom 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .celeb-active .anim-mandala {
+            animation: mandalaBloom 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Reset Confirm Animation */
+        .reset-modal-active {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            backdrop-filter: blur(15px);
+            cursor: default !important;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-primary text-surface font-sans h-[100dvh] w-full relative overflow-hidden selection:bg-accent selection:text-primary cursor-pointer select-none transition-colors duration-1000"
+    id="touch-area">
+
+    <!-- Overlay -->
+    <div class="fixed inset-0 z-[1] opacity-30 mix-blend-soft-light bg-grain pointer-events-none"></div>
+
+    <!-- Parallax Background -->
+    <div id="parallax-text"
+        class="parallax-bg fixed inset-0 z-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
+        <span
+            class="font-arabic text-[60vw] md:text-[40vw] text-accent leading-none whitespace-nowrap transform -rotate-12 select-none transition-opacity duration-700">سبحان
+            الله</span>
+    </div>
+
+    <!-- SVG Path -->
+    <svg class="fixed right-[30%] top-0 h-full w-[200px] pointer-events-none z-0 opacity-20" viewBox="0 0 100 1000"
+        preserveAspectRatio="none">
+        <!-- Match offset-path in CSS -->
+        <path id="golden-path" d="M 50 0 C 200 300, -100 700, 50 1000" stroke="url(#gold-grad)" stroke-width="1.5"
+            fill="none" class="drop-shadow-[0_0_8px_rgba(212,175,55,0.8)]" />
+        <defs>
+            <linearGradient id="gold-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#D4AF37" stop-opacity="0" />
+                <stop offset="50%" stop-color="#D4AF37" stop-opacity="1" />
+                <stop offset="100%" stop-color="#D4AF37" stop-opacity="0" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <!-- Particles -->
+    <div id="particle-container" class="fixed right-[30%] top-0 h-full w-[200px] pointer-events-none z-10"></div>
+
+    <!-- Ambient Glow -->
+    <div id="ambient-glow"
+        class="fixed top-1/2 left-0 -translate-y-1/2 w-[80vw] h-[80vw] md:w-[60vw] md:h-[60vw] bg-accent/10 rounded-full blur-[120px] pointer-events-none transition-colors duration-1000 z-0">
+    </div>
+
+    <!-- Header -->
+    <header class="fixed top-5 left-0 right-0 z-40 pointer-events-none animate-fade-up opacity-0">
+        <a href="../index.html" class="flex items-center justify-center gap-2 pointer-events-auto group w-fit mx-auto">
+            <img src="../public/assets/images/logo2.png" alt="Noor Ramadhan" class="h-6 w-6 object-contain">
+            <span
+                class="font-display text-sm text-surface  group-hover:text-surface/60 transition-colors duration-500">Noor
+                Ramadhan</span>
+        </a>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-20 h-full w-full flex flex-col justify-center pl-[8%] md:pl-[15%] pointer-events-none">
+        <section aria-label="Zikir Counter"
+            class="flex flex-col items-start relative w-full pr-20 md:pr-0 md:max-w-[70vw]">
+            <p id="phrase-display"
+                class="font-arabic text-4xl md:text-5xl lg:text-5xl text-accent mb-8 drop-shadow-md transition-all duration-700 animate-fade-up opacity-0 delay-100">
+                سُبْحَانَ ٱللَّٰهِ</p>
+
+            <div class="relative animate-fade-up opacity-0 delay-300">
+                <h1 id="count-display"
+                    class="font-arabic text-[clamp(6rem,20vw,25rem)] leading-[0.85] text-background font-bold tracking-tighter origin-bottom-left will-change-transform">
+                    0</h1>
+            </div>
+
+            <!-- Counter Info & Button Container -->
+            <div
+                class="flex flex-wrap sm:flex-nowrap items-center gap-3 md:gap-6 mt-8 md:mt-8 pointer-events-auto w-full animate-fade-up opacity-0 delay-500">
+                <!-- Info text (slightly faded) -->
+                <div class="flex items-center gap-3 md:gap-6 opacity-80 pointer-events-none">
+                    <span class="w-8 md:w-16 h-[1px] bg-accent/40 flex-shrink-0"></span>
+                    <p
+                        class="font-sans text-accent tracking-wider uppercase text-[10px] md:text-sm font-medium flex-shrink-0">
+                        Jumlah Zikir <span id="target-display" class="text-surface/40 ml-1 md:ml-2 font-medium">/
+                            33</span>
+                    </p>
+                </div>
+
+                <!-- Add Zikir Button (100% opacity) -->
+                <button id="orb-tambah" onclick="handleIncrement(event)"
+                    class="w-12 h-12 md:w-16 md:h-16 flex-shrink-0 bg-accent rounded-full flex items-center justify-center group overflow-hidden relative shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:scale-110 active:scale-95 transition-all duration-300 ml-2 md:ml-6 cursor-pointer">
+                    <!-- Tasbih Icon -->
+                    <svg class="w-6 h-6 md:w-8 md:h-8 text-primary transform group-hover:rotate-12 transition-transform duration-500 flex-shrink-0"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            stroke-dasharray="0.1 4.5"
+                            d="M12 2 C16.5 2 19.5 5.5 19.5 10 C19.5 14.5 14 18 12 20 C10 18 4.5 14.5 4.5 10 C4.5 5.5 7.5 2 12 2 Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M12 20v4M10 23l2-3l2 3" />
+                    </svg>
+                </button>
+            </div>
+
+            <p
+                class="font-sans text-surface text-sm mt-6 mb-10 max-w-[300px] font-extralight tracking-wide leading-relaxed pointer-events-none animate-fade-up opacity-0 delay-700">
+                Sentuh layar atau klik tombol tasbih<br>untuk bertasbih.
+            </p>
+        </section>
+    </main>
+
+    <!-- Navigation & Controls -->
+    <nav
+        class="fixed right-6 md:right-12 inset-y-0 z-30 flex flex-col justify-center gap-8 pointer-events-auto items-center animate-fade-up opacity-0 delay-1000">
+
+        <!-- Target Selectors -->
+        <div class="flex flex-col gap-4">
+            <button onclick="setTarget(33); event.stopPropagation();" id="btn-33"
+                class="target-btn target-active w-12 h-12 rounded-full flex items-center justify-center font-sans text-sm font-medium tracking-wider text-surface/50 border border-surface/20 transition-all duration-500 hover:border-surface/60 hover:text-surface">
+                33
+            </button>
+            <button onclick="setTarget(100); event.stopPropagation();" id="btn-100"
+                class="target-btn w-12 h-12 rounded-full flex items-center justify-center font-sans text-sm font-medium tracking-wider text-surface/50 border border-surface/20 transition-all duration-500 hover:border-surface/60 hover:text-surface">
+                100
+            </button>
+            <button onclick="setTarget(Infinity); event.stopPropagation();" id="btn-inf"
+                class="target-btn w-12 h-12 rounded-full flex items-center justify-center font-sans text-xl font-light text-surface/50 border border-surface/20 transition-all duration-500 hover:border-surface/60 hover:text-surface">
+                ∞
+            </button>
+        </div>
+
+        <div class="h-12 w-[1px] bg-gradient-to-b from-surface/20 via-surface/5 to-transparent"></div>
+
+        <div class="flex flex-col gap-4">
+            <!-- Sound Toggle Button -->
+            <button onclick="toggleSound(); event.stopPropagation();" id="sound-toggle-btn"
+                class="w-12 h-12 rounded-full flex items-center justify-center group border border-surface/20 text-surface/50 hover:text-accent hover:border-accent transition-all duration-500">
+                <span id="sound-icon-on"
+                    class="material-symbols-outlined hidden transition-transform duration-300 group-hover:scale-110 text-xl">
+                    volume_up
+                </span>
+                <span id="sound-icon-off"
+                    class="material-symbols-outlined transition-transform duration-300 group-hover:scale-110 text-xl">
+                    volume_off
+                </span>
+            </button>
+
+            <!-- Reset Button -->
+            <button onclick="reset(); event.stopPropagation();"
+                class="w-12 h-12 rounded-full flex items-center justify-center group border border-surface/20 text-surface/50 hover:text-accent hover:border-accent transition-all duration-500">
+                <span
+                    class="material-symbols-outlined transform group-hover:rotate-180 transition-transform duration-700 ease-in-out text-xl">
+                    refresh
+                </span>
+            </button>
+
+            <!-- Home Button -->
+            <a href="../index.html" onclick="event.stopPropagation();"
+                class="w-12 h-12 rounded-full flex items-center justify-center group border border-surface/20 text-surface/50 hover:text-surface hover:border-surface/80 transition-all duration-500">
+                <span class="material-symbols-outlined transform transition-transform duration-500 text-xl">
+                    home
+                </span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Reset Modal -->
+    <div id="reset-modal"
+        class="fixed inset-0 z-[110] flex items-center justify-center bg-primary/80 opacity-0 pointer-events-none transition-all duration-700">
+        <div class="flex flex-col items-center text-center px-6">
+            <h3 class="font-serif text-4xl md:text-5xl text-surface font-bold mb-4 tracking-tight">Mulai dari awal?</h3>
+            <p class="font-sans text-surface/60 text-sm md:text-base font-light tracking-wide mb-10">Hitungan Anda saat
+                ini akan dihapus.</p>
+
+            <div class="flex flex-col md:flex-row gap-4 w-full max-w-xs">
+                <!-- Ya, Reset Button (Gold Fill) -->
+                <button onclick="confirmReset()"
+                    class="group relative px-8 py-3.5 bg-accent text-primary font-bold rounded-full overflow-hidden transform active:scale-95 transition-all duration-300 ease-out">
+                    <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
+                        <div
+                            class="absolute left-1/2 bottom-0 w-[150%] aspect-square -translate-x-1/2 translate-y-1/2 bg-white/20 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 ease-out blur-[2px]">
+                        </div>
+                    </div>
+                    <span class="relative z-10 transition-all uppercase text-xs tracking-widest">
+                        Ya, Reset
+                    </span>
+                </button>
+
+                <!-- Batalkan Button (Surface Fill) -->
+                <button onclick="cancelReset()"
+                    class="group relative px-8 py-3.5 border border-surface/20 text-surface/70 hover:text-surface hover:border-transparent rounded-full overflow-hidden transform active:scale-95 transition-all duration-300 ease-out">
+                    <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
+                        <div
+                            class="absolute left-1/2 bottom-0 w-[150%] aspect-square -translate-x-1/2 translate-y-1/2 bg-surface rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 ease-out blur-[2px]">
+                        </div>
+                    </div>
+                    <span
+                        class="relative z-10 transition-all uppercase text-xs tracking-widest group-hover:text-primary">
+                        Batalkan
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Celebration Screen -->
+    <div id="celebration-screen"
+        class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-primary/95 opacity-0 pointer-events-none transition-all duration-1000">
+
+        <!-- Ornaments -->
+        <div class="absolute inset-0 flex items-center justify-center overflow-hidden z-0">
+            <svg class="anim-mandala w-[100vw] h-[100vw] lg:w-[60vw] lg:h-[60vw] text-accent opacity-0"
+                viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="0.15">
+                <!-- Outer Ring -->
+                <circle cx="50" cy="50" r="48" opacity="0.1" />
+
+                <!-- Star -->
+                <path d="M50 5 L63 37 L95 50 L63 63 L50 95 L37 63 L5 50 L37 37 Z" />
+                <path d="M50 5 L63 37 L95 50 L63 63 L50 95 L37 63 L5 50 L37 37 Z" transform="rotate(45 50 50)" />
+
+                <!-- Patterns -->
+                <circle cx="50" cy="50" r="25" opacity="0.2" />
+                <path d="M50 25 L50 75 M25 50 L75 50" opacity="0.1" />
+
+                <!-- Dots -->
+                <circle cx="50" cy="15" r="0.5" fill="currentColor" />
+                <circle cx="50" cy="85" r="0.5" fill="currentColor" />
+                <circle cx="15" cy="50" r="0.5" fill="currentColor" />
+                <circle cx="85" cy="50" r="0.5" fill="currentColor" />
+            </svg>
+        </div>
+
+        <div class="relative z-10 flex flex-col items-center text-center px-6 max-w-3xl">
+            <div class="celeb-text-1 mb-8">
+                <span class="font-sans text-accent tracking-[0.5em] uppercase text-xs mb-4 block">Pencapaian
+                    Zikir</span>
+                <h2 class="font-serif text-6xl md:text-8xl text-surface font-bold tracking-tight">
+                    Target Tercapai
+                </h2>
+            </div>
+
+            <p
+                class="celeb-text-2 font-sans text-surface/60 text-lg font-light tracking-wide max-w-md mb-12 leading-relaxed italic">
+                "Alhamdulillah, segala puji bagi Allah yang dengan nikmat-Nya kebaikan menjadi sempurna."
+            </p>
+
+            <button onclick="closeCelebration()"
+                class="celeb-btn group relative px-12 py-4 bg-accent text-primary rounded-full overflow-hidden transform active:scale-95 transition-all duration-300 ease-out">
+                <!-- Hover Effect -->
+                <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
+                    <div
+                        class="absolute left-1/2 bottom-0 w-[150%] aspect-square -translate-x-1/2 translate-y-1/2 bg-white/20 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 ease-out blur-[2px]">
+                    </div>
+                </div>
+
+                <span
+                    class="relative z-10 font-bold tracking-widest uppercase text-xs flex items-center gap-3 transition-all duration-300">
+                    Lanjutkan Zikir
+                    <!-- Icon -->
+                    <svg class="w-5 h-5 transform group-hover:rotate-6 transition-transform duration-500 flex-shrink-0"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <!-- SVG Path -->
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            stroke-dasharray="0.1 4.5"
+                            d="M12 2 C16.5 2 19.5 5.5 19.5 10 C19.5 14.5 14 18 12 20 C10 18 4.5 14.5 4.5 10 C4.5 5.5 7.5 2 12 2 Z" />
+                        <!-- SVG Path -->
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M12 20v4M10 23l2-3l2 3" />
+                    </svg>
+                </span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="fixed bottom-4 left-0 right-0 z-30 pointer-events-none">
+        <div class="flex items-center justify-center gap-3 font-sans text-[10px] text-surface/30 tracking-wide">
+            <span>&copy; 1447H</span>
+            <span class="w-[3px] h-[3px] rounded-full bg-surface/20"></span>
+            <a href="../index.html" class="pointer-events-auto hover:text-accent/70 transition-colors duration-300">Doa
+                Sahur & Buka</a>
+            <span class="w-[3px] h-[3px] rounded-full bg-surface/20"></span>
+            <a href="#" class="pointer-events-auto hover:text-accent/70 transition-colors duration-300">Al-Quran</a>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../public/assets/js/zikir.js"></script>
+</body>
+
+</html>
