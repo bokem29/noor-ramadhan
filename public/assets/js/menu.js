@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Generate the menu HTML dynamically so we only maintain it in one place
+    const isInPages = window.location.pathname.includes('/pages/');
     const menuHTML = `
         <button id="menu-trigger" aria-label="Toggle Menu" class="fixed top-6 right-6 md:top-10 md:right-10 z-[110] w-14 h-14 flex flex-col justify-center items-center gap-[6px] group cursor-pointer overflow-hidden rounded-[8px] bg-primary border border-surface/20 transition-colors duration-500 hover:bg-primary/90 hover:border-accent">
             <span class="w-6 h-[2px] bg-accent rounded-full transform transition-all duration-500 origin-center group-[.menu-open]:rotate-45 group-[.menu-open]:translate-y-[8px]"></span>
@@ -13,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div id="menu-bg-circle" class="absolute top-10 right-10 md:top-14 md:right-14 w-4 h-4 bg-[#0a1e16] rounded-full transition-transform duration-[800ms] ease-[cubic-bezier(0.76,0,0.24,1)]" style="transform: scale(0);"></div>
             
             <nav class="relative z-10 flex flex-col items-center gap-8 md:gap-12 text-center w-full px-6 -mt-16">
-                <a href="${window.location.pathname.includes('pages/zikir.html') || window.location.pathname.includes('pages/zakat.html') ? '../index.html' : 'index.html'}" class="menu-item group font-bold font-sans text-background text-2xl md:text-3xl lg:text-4xl transition-all duration-700 translate-y-16 opacity-0 flex perspective-[1000px]">
+                <a href="${isInPages ? '../index.html' : 'index.html'}" class="menu-item group font-bold font-sans text-background text-2xl md:text-3xl lg:text-4xl transition-all duration-700 translate-y-16 opacity-0 flex perspective-[1000px]">
                     <span class="sr-only">Doa & Niat Puasa</span>
                     <div class="flex overflow-hidden relative" aria-hidden="true">
                         ${'Doa & Niat Puasa'.split('').map((char, index) => `<span class="inline-block transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] transform group-hover:-translate-y-full" style="transition-delay: ${index * 20}ms">${char === ' ' ? '&nbsp;' : char}</span>`).join('')}
@@ -23,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </a>
                 
-                <a href="${window.location.pathname.includes('pages/zikir.html') || window.location.pathname.includes('pages/zakat.html') ? 'zikir.html' : 'pages/zikir.html'}" class="menu-item group font-bold font-sans text-background text-2xl md:text-3xl lg:text-4xl transition-all duration-700 translate-y-16 opacity-0 flex perspective-[1000px]">
+                <a href="${isInPages ? 'zikir.html' : 'pages/zikir.html'}" class="menu-item group font-bold font-sans text-background text-2xl md:text-3xl lg:text-4xl transition-all duration-700 translate-y-16 opacity-0 flex perspective-[1000px]">
                     <span class="sr-only">Zikir Counter</span>
                     <div class="flex overflow-hidden relative" aria-hidden="true">
                         ${'Zikir Counter'.split('').map((char, index) => `<span class="inline-block transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] transform group-hover:-translate-y-full" style="transition-delay: ${index * 20}ms">${char === ' ' ? '&nbsp;' : char}</span>`).join('')}
@@ -33,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </a>
 
-                <a href="${window.location.pathname.includes('pages/zikir.html') || window.location.pathname.includes('pages/zakat.html') ? 'zakat.html' : 'pages/zakat.html'}" class="menu-item group font-bold font-sans text-background text-2xl md:text-3xl lg:text-4xl transition-all duration-700 translate-y-16 opacity-0 flex perspective-[1000px]">
+                <a href="${isInPages ? 'zakat.html' : 'pages/zakat.html'}" class="menu-item group font-bold font-sans text-background text-2xl md:text-3xl lg:text-4xl transition-all duration-700 translate-y-16 opacity-0 flex perspective-[1000px]">
                     <span class="sr-only">Kalkulator Zakat</span>
                     <div class="flex overflow-hidden relative" aria-hidden="true">
                         ${'Kalkulator Zakat'.split('').map((char, index) => `<span class="inline-block transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] transform group-hover:-translate-y-full" style="transition-delay: ${index * 20}ms">${char === ' ' ? '&nbsp;' : char}</span>`).join('')}
@@ -42,11 +43,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                 </a>
+
+                <a href="${isInPages ? 'todolist.html' : 'pages/todolist.html'}" class="menu-item group font-bold font-sans text-background text-2xl md:text-3xl lg:text-4xl transition-all duration-700 translate-y-16 opacity-0 flex perspective-[1000px]">
+                    <span class="sr-only">Kitab Amal</span>
+                    <div class="flex overflow-hidden relative" aria-hidden="true">
+                        ${'Kitab Amal'.split('').map((char, index) => `<span class="inline-block transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] transform group-hover:-translate-y-full" style="transition-delay: ${index * 20}ms">${char === ' ' ? '&nbsp;' : char}</span>`).join('')}
+                        <div class="absolute inset-0 flex text-accent">
+                            ${'Kitab Amal'.split('').map((char, index) => `<span class="inline-block transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] transform translate-y-full group-hover:translate-y-0" style="transition-delay: ${index * 20}ms">${char === ' ' ? '&nbsp;' : char}</span>`).join('')}
+                        </div>
+                    </div>
+                </a>
             </nav>
             
             <!-- Ornaments inside menu -->
             <div id="menu-ornament" class="absolute bottom-16 left-1/2 -translate-x-1/2 opacity-0 transition-all duration-1000 translate-y-10 flex flex-col items-center">
-                <img src="${(window.location.pathname.includes('pages/zikir.html') || window.location.pathname.includes('pages/zakat.html')) ? '../public/assets/images/logo2.png' : './public/assets/images/logo2.png'}" alt="Logo Noor Ramadhan" class="h-12 w-auto object-contain ">
+                <img src="${isInPages ? '../public/assets/images/logo2.png' : './public/assets/images/logo2.png'}" alt="Logo Noor Ramadhan" class="h-12 w-auto object-contain ">
             </div>
         </div>
     `;

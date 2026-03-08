@@ -1,0 +1,1552 @@
+ <!doctype html>
+<html lang="id" class="scroll-smooth">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="shortcut icon"
+            href="../public/assets/images/logo.png"
+            type="image/x-icon"
+        />
+        <title>Kitab Amal | Noor Ramadhan</title>
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Sora:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0"
+            rel="stylesheet"
+        />
+
+        <!-- Tailwind CSS -->
+        <link rel="stylesheet" href="../src/output.css" />
+
+        <style>
+            body {
+                background-color: #fcf9f2;
+                margin: 0;
+                padding: 0;
+                overflow-x: hidden;
+            }
+
+            /* Grain Texture */
+            .bg-grain {
+                background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+                opacity: 0.05;
+                pointer-events: none;
+            }
+
+            /* Geometric Islamic Grid */
+            .geo-grid {
+                position: fixed;
+                inset: 0;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%231B4332' stroke-width='0.5' opacity='0.35'%3E%3Cpath d='M40 10 L50 30 L70 40 L50 50 L40 70 L30 50 L10 40 L30 30 Z'/%3E%3Cpath d='M40 10 L50 30 L70 40 L50 50 L40 70 L30 50 L10 40 L30 30 Z' transform='rotate(45 40 40)'/%3E%3Ccircle cx='40' cy='40' r='8'/%3E%3C/g%3E%3C/svg%3E");
+                background-size: 80px 80px;
+                opacity: 0.03;
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            /* Light Ray */
+            .light-ray {
+                position: fixed;
+                top: -20%;
+                right: 10%;
+                width: 300px;
+                height: 140vh;
+                background: linear-gradient(
+                    180deg,
+                    transparent 0%,
+                    rgba(212, 175, 55, 0.03) 30%,
+                    rgba(255, 255, 255, 0.04) 50%,
+                    rgba(212, 175, 55, 0.02) 70%,
+                    transparent 100%
+                );
+                transform: rotate(25deg);
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            /* Particle Canvas */
+            #particle-canvas {
+                position: fixed;
+                inset: 0;
+                z-index: 1;
+                pointer-events: none;
+            }
+
+            /* Orbit Progress */
+            .orbit-ring {
+                transition: stroke-dashoffset 1s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            @keyframes orbitPulse {
+                0%,
+                100% {
+                    filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0));
+                }
+                50% {
+                    filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.4));
+                }
+            }
+
+            .orbit-complete {
+                animation: orbitPulse 2s ease-in-out infinite;
+            }
+
+            /* Tasbih Bead Tabs */
+            .bead-tab {
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                border: 2px solid rgba(27, 67, 50, 0.15);
+                background: transparent;
+                cursor: pointer;
+                transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+            }
+
+            .bead-tab:hover {
+                border-color: rgba(212, 175, 55, 0.5);
+                transform: scale(1.08);
+            }
+
+            .bead-tab.active {
+                width: 56px;
+                height: 56px;
+                background: #d4af37;
+                border-color: #d4af37;
+                box-shadow:
+                    0 0 25px rgba(212, 175, 55, 0.3),
+                    0 8px 20px rgba(212, 175, 55, 0.15);
+                transform: scale(1.1);
+            }
+
+            .bead-tab.active .bead-icon {
+                color: #1b4332;
+            }
+
+            .bead-tab.active + .bead-label {
+                color: #d4af37;
+                font-weight: 700;
+            }
+
+            .bead-connector {
+                width: 32px;
+                height: 2px;
+                background: linear-gradient(
+                    90deg,
+                    rgba(212, 175, 55, 0.1),
+                    rgba(212, 175, 55, 0.3),
+                    rgba(212, 175, 55, 0.1)
+                );
+                border-radius: 1px;
+            }
+
+            /* Timeline Node */
+            .timeline-node {
+                width: 52px;
+                height: 52px;
+                border-radius: 50%;
+                border: 2px solid rgba(27, 67, 50, 0.15);
+                background: rgba(255, 255, 255, 0.6);
+                backdrop-filter: blur(10px);
+                cursor: pointer;
+                transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+            }
+
+            .timeline-node:hover {
+                border-color: rgba(212, 175, 55, 0.6);
+                transform: scale(1.1);
+                box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+            }
+
+            .timeline-node.checked {
+                background: #d4af37;
+                border-color: #d4af37;
+                box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+            }
+
+            .timeline-node.checked .node-icon {
+                color: #1b4332;
+            }
+
+            @keyframes nodeRipple {
+                0% {
+                    transform: scale(1);
+                    opacity: 0.6;
+                }
+                100% {
+                    transform: scale(2.5);
+                    opacity: 0;
+                }
+            }
+
+            .node-ripple {
+                position: absolute;
+                inset: 0;
+                border-radius: 50%;
+                border: 2px solid #d4af37;
+                animation: nodeRipple 0.8s cubic-bezier(0.16, 1, 0.3, 1)
+                    forwards;
+                pointer-events: none;
+            }
+
+            /* Constellation Star */
+            .constellation-star {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+                position: relative;
+                font-family: "Sora", sans-serif;
+                font-size: 11px;
+                font-weight: 500;
+                color: rgba(27, 67, 50, 0.5);
+                background: rgba(255, 255, 255, 0.4);
+                backdrop-filter: blur(8px);
+                border: 1px solid rgba(27, 67, 50, 0.08);
+            }
+
+            .constellation-star:hover {
+                transform: scale(1.2);
+                border-color: rgba(212, 175, 55, 0.4);
+                box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+            }
+
+            .constellation-star.fasted {
+                background: linear-gradient(135deg, #d4af37, #c9a030);
+                color: #1b4332;
+                font-weight: 700;
+                border-color: #d4af37;
+                box-shadow:
+                    0 0 15px rgba(212, 175, 55, 0.3),
+                    0 4px 12px rgba(212, 175, 55, 0.15);
+            }
+
+            @keyframes starGlow {
+                0%,
+                100% {
+                    box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+                }
+                50% {
+                    box-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
+                }
+            }
+
+            .constellation-star.fasted {
+                animation: starGlow 3s ease-in-out infinite;
+            }
+
+            .constellation-star.today {
+                border: 2px solid #d4af37;
+                box-shadow: 0 0 20px rgba(212, 175, 55, 0.25);
+            }
+
+            /* Tab Content Transitions */
+            .tab-content {
+                display: none;
+                opacity: 0;
+                transform: translateY(20px);
+                transition:
+                    opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            .tab-content.active {
+                display: block;
+            }
+
+            /* Progress Bar */
+            .progress-fill {
+                transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            /* Motivational Toast */
+            @keyframes toastIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(15px) scale(0.95);
+                    filter: blur(8px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                    filter: blur(0);
+                }
+            }
+
+            .toast-motivasi {
+                animation: toastIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+
+            /* Quran Story Input */
+            .story-input {
+                appearance: none;
+                background: transparent;
+                border: none;
+                border-bottom: 2px dashed rgba(212, 175, 55, 0.5);
+                color: #1b4332;
+                font-family: "Sora", sans-serif;
+                font-weight: 700;
+                text-align: center;
+                outline: none;
+                transition: all 0.3s ease;
+                box-shadow: none;
+            }
+
+            .story-input:focus {
+                border-bottom-style: solid;
+                border-bottom-color: #d4af37;
+            }
+
+            .story-input::placeholder {
+                color: rgba(27, 67, 50, 0.2);
+                font-weight: 400;
+            }
+
+            /* Hide Number Input Arrows */
+            input[type="number"]::-webkit-inner-spin-button,
+            input[type="number"]::-webkit-outer-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+
+            input[type="number"] {
+                -moz-appearance: textfield;
+                appearance: textfield;
+            }
+
+            /* Material Icon Fix */
+            .material-symbols-outlined {
+                font-size: 24px !important;
+                line-height: 1 !important;
+            }
+        </style>
+    </head>
+
+    <body
+        class="text-primary font-sans min-h-screen relative selection:bg-accent selection:text-background"
+        style="
+            background: linear-gradient(
+                170deg,
+                #fcf9f2 0%,
+                #f5f0e8 40%,
+                #eef2ec 100%
+            );
+        "
+    >
+        <!-- Background Layers -->
+        <div class="fixed inset-0 z-0 bg-grain"></div>
+        <div class="geo-grid"></div>
+        <div class="light-ray"></div>
+        <canvas id="particle-canvas"></canvas>
+
+        <!-- Header -->
+        <header
+            class="relative z-40 p-6 md:p-8 flex justify-between items-center w-full max-w-7xl mx-auto"
+        >
+            <a href="../index.html" class="flex items-center gap-2 group">
+                <img
+                    src="../public/assets/images/logo3.png"
+                    alt="Noor Ramadhan"
+                    class="h-6 w-6 object-contain"
+                />
+                <span
+                    class="font-display text-sm tracking-wide text-primary hidden sm:block"
+                    >Noor Ramadhan</span
+                >
+            </a>
+            <div
+                class="flex items-center gap-3 text-primary/40 font-sans text-xs tracking-widest uppercase"
+            >
+                <span id="ramadhan-day-header" class="font-bold text-accent"
+                    >Hari ke-1</span
+                >
+                <span>Ramadhan 1447H</span>
+            </div>
+        </header>
+
+        <!-- Main -->
+        <main class="relative z-10 w-full max-w-5xl mx-auto px-6 pb-24">
+            <!-- Hero -->
+            <section class="text-center mb-16 animate-fade-up opacity-0">
+                <span
+                    class="font-sans text-accent tracking-[0.3em] uppercase text-xs mb-3 block font-bold"
+                    >Ramadhan To-Do List</span
+                >
+                <h1
+                    class="font-serif text-5xl md:text-7xl font-bold text-primary tracking-tight leading-tight mb-4"
+                >
+                    Kitab
+                    <span class="italic text-accent relative inline-block"
+                        >Amal
+                        <svg
+                            class="absolute -bottom-2 left-0 w-full h-3 text-accent/30"
+                            viewBox="0 0 100 20"
+                            preserveAspectRatio="none"
+                        >
+                            <path
+                                d="M0,10 Q50,20 100,10"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="4"
+                                stroke-linecap="round"
+                            />
+                        </svg>
+                    </span>
+                </h1>
+                <p
+                    class="font-sans text-primary/50 text-sm md:text-base max-w-lg mx-auto leading-relaxed mt-4"
+                >
+                    Pantau ibadah harianmu, tingkatkan konsistensi, dan raih
+                    keberkahan di bulan suci Ramadhan.
+                </p>
+            </section>
+
+            <!-- Orbit Progress Hub -->
+            <section class="mb-16 animate-fade-up opacity-0 delay-200">
+                <div
+                    class="glass-panel rounded-3xl p-8 md:p-10 relative overflow-hidden"
+                    style="
+                        background: rgba(255, 255, 255, 0.4);
+                        backdrop-filter: blur(16px);
+                        border: 1px solid rgba(27, 67, 50, 0.08);
+                    "
+                >
+                    <!-- Decorative watermark -->
+                    <div
+                        class="absolute -right-4 -top-4 font-arabic text-[10rem] text-primary/[0.02] pointer-events-none select-none leading-none"
+                    >
+                        عمل
+                    </div>
+
+                    <div
+                        class="flex flex-col md:flex-row items-center gap-8 md:gap-12"
+                    >
+                        <!-- 4 Mini Orbits -->
+                        <div
+                            class="flex items-center justify-center gap-6 md:gap-8 flex-wrap"
+                        >
+                            <!-- Shalat Orbit -->
+                            <div class="flex flex-col items-center gap-2">
+                                <div class="relative w-[72px] h-[72px]">
+                                    <svg
+                                        class="w-full h-full -rotate-90"
+                                        viewBox="0 0 72 72"
+                                    >
+                                        <circle
+                                            cx="36"
+                                            cy="36"
+                                            r="32"
+                                            fill="none"
+                                            stroke="rgba(27,67,50,0.08)"
+                                            stroke-width="4"
+                                        />
+                                        <circle
+                                            id="orbit-shalat"
+                                            class="orbit-ring"
+                                            cx="36"
+                                            cy="36"
+                                            r="32"
+                                            fill="none"
+                                            stroke="#D4AF37"
+                                            stroke-width="4"
+                                            stroke-linecap="round"
+                                            stroke-dasharray="201.06"
+                                            stroke-dashoffset="201.06"
+                                        />
+                                    </svg>
+                                    <span
+                                        class="absolute inset-0 flex items-center justify-center font-sans text-xs font-bold text-primary"
+                                        id="orbit-shalat-pct"
+                                        >0%</span
+                                    >
+                                </div>
+                                <span
+                                    class="font-sans text-[10px] uppercase tracking-widest text-primary/40 font-semibold"
+                                    >Shalat</span
+                                >
+                            </div>
+
+                            <!-- Quran Orbit -->
+                            <div class="flex flex-col items-center gap-2">
+                                <div class="relative w-[72px] h-[72px]">
+                                    <svg
+                                        class="w-full h-full -rotate-90"
+                                        viewBox="0 0 72 72"
+                                    >
+                                        <circle
+                                            cx="36"
+                                            cy="36"
+                                            r="32"
+                                            fill="none"
+                                            stroke="rgba(27,67,50,0.08)"
+                                            stroke-width="4"
+                                        />
+                                        <circle
+                                            id="orbit-quran"
+                                            class="orbit-ring"
+                                            cx="36"
+                                            cy="36"
+                                            r="32"
+                                            fill="none"
+                                            stroke="#D4AF37"
+                                            stroke-width="4"
+                                            stroke-linecap="round"
+                                            stroke-dasharray="201.06"
+                                            stroke-dashoffset="201.06"
+                                        />
+                                    </svg>
+                                    <span
+                                        class="absolute inset-0 flex items-center justify-center font-sans text-xs font-bold text-primary"
+                                        id="orbit-quran-pct"
+                                        >0%</span
+                                    >
+                                </div>
+                                <span
+                                    class="font-sans text-[10px] uppercase tracking-widest text-primary/40 font-semibold"
+                                    >Quran</span
+                                >
+                            </div>
+
+                            <!-- Puasa Orbit -->
+                            <div class="flex flex-col items-center gap-2">
+                                <div class="relative w-[72px] h-[72px]">
+                                    <svg
+                                        class="w-full h-full -rotate-90"
+                                        viewBox="0 0 72 72"
+                                    >
+                                        <circle
+                                            cx="36"
+                                            cy="36"
+                                            r="32"
+                                            fill="none"
+                                            stroke="rgba(27,67,50,0.08)"
+                                            stroke-width="4"
+                                        />
+                                        <circle
+                                            id="orbit-puasa"
+                                            class="orbit-ring"
+                                            cx="36"
+                                            cy="36"
+                                            r="32"
+                                            fill="none"
+                                            stroke="#D4AF37"
+                                            stroke-width="4"
+                                            stroke-linecap="round"
+                                            stroke-dasharray="201.06"
+                                            stroke-dashoffset="201.06"
+                                        />
+                                    </svg>
+                                    <span
+                                        class="absolute inset-0 flex items-center justify-center font-sans text-xs font-bold text-primary"
+                                        id="orbit-puasa-pct"
+                                        >0%</span
+                                    >
+                                </div>
+                                <span
+                                    class="font-sans text-[10px] uppercase tracking-widest text-primary/40 font-semibold"
+                                    >Puasa</span
+                                >
+                            </div>
+
+                            <!-- Dzikir Orbit -->
+                            <div class="flex flex-col items-center gap-2">
+                                <div class="relative w-[72px] h-[72px]">
+                                    <svg
+                                        class="w-full h-full -rotate-90"
+                                        viewBox="0 0 72 72"
+                                    >
+                                        <circle
+                                            cx="36"
+                                            cy="36"
+                                            r="32"
+                                            fill="none"
+                                            stroke="rgba(27,67,50,0.08)"
+                                            stroke-width="4"
+                                        />
+                                        <circle
+                                            id="orbit-dzikir"
+                                            class="orbit-ring"
+                                            cx="36"
+                                            cy="36"
+                                            r="32"
+                                            fill="none"
+                                            stroke="#D4AF37"
+                                            stroke-width="4"
+                                            stroke-linecap="round"
+                                            stroke-dasharray="201.06"
+                                            stroke-dashoffset="201.06"
+                                        />
+                                    </svg>
+                                    <span
+                                        class="absolute inset-0 flex items-center justify-center font-sans text-xs font-bold text-primary"
+                                        id="orbit-dzikir-pct"
+                                        >0%</span
+                                    >
+                                </div>
+                                <span
+                                    class="font-sans text-[10px] uppercase tracking-widest text-primary/40 font-semibold"
+                                    >Dzikir</span
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Total Progress -->
+                        <div
+                            class="flex-1 flex flex-col items-center md:items-start gap-3 text-center md:text-left"
+                        >
+                            <div class="flex items-baseline gap-2">
+                                <span
+                                    id="total-progress-num"
+                                    class="font-serif text-5xl md:text-6xl font-bold text-primary tracking-tight"
+                                    >0</span
+                                >
+                                <span class="font-serif text-2xl text-accent"
+                                    >%</span
+                                >
+                            </div>
+                            <p
+                                class="font-sans text-xs uppercase tracking-widest text-primary/40 font-semibold"
+                            >
+                                Progress Harian
+                            </p>
+                            <!-- Motivasi Status -->
+                            <div
+                                id="status-motivasi"
+                                class="mt-2 px-5 py-2 rounded-full bg-primary/5 border border-primary/10"
+                            >
+                                <p
+                                    class="font-sans text-xs text-primary/60 font-medium tracking-wide"
+                                >
+                                    <span class="text-accent mr-1">☽</span>
+                                    Mulai isi ibadahmu hari ini
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab Navigation — Tasbih Beads -->
+            <div class="flex justify-center mb-16 animate-fade-up opacity-0 delay-300">
+                <nav
+                    style="display: grid; grid-template-columns: auto 44px auto 44px auto 44px auto; row-gap: 12px; align-items: center; justify-items: center;"
+                >
+                    <!-- Row 1: Circles + Connectors -->
+                    <button
+                        class="bead-tab active"
+                        data-tab="shalat"
+                        onclick="switchTab('shalat')"
+                    >
+                        <span
+                            class="bead-icon material-symbols-outlined text-primary/40"
+                            style="font-size: 20px !important"
+                            >mosque</span
+                        >
+                    </button>
+                    <div class="bead-connector w-full"></div>
+                    <button
+                        class="bead-tab"
+                        data-tab="quran"
+                        onclick="switchTab('quran')"
+                    >
+                        <span
+                            class="bead-icon material-symbols-outlined text-primary/40"
+                            style="font-size: 20px !important"
+                            >menu_book</span
+                        >
+                    </button>
+                    <div class="bead-connector w-full"></div>
+                    <button
+                        class="bead-tab"
+                        data-tab="puasa"
+                        onclick="switchTab('puasa')"
+                    >
+                        <span
+                            class="bead-icon material-symbols-outlined text-primary/40"
+                            style="font-size: 20px !important"
+                            >calendar_month</span
+                        >
+                    </button>
+                    <div class="bead-connector w-full"></div>
+                    <button
+                        class="bead-tab"
+                        data-tab="dzikir"
+                        onclick="switchTab('dzikir')"
+                    >
+                        <span
+                            class="bead-icon material-symbols-outlined text-primary/40"
+                            style="font-size: 20px !important"
+                            >prayer_times</span
+                        >
+                    </button>
+
+                    <!-- Row 2: Labels (same grid columns as circles) -->
+                    <span
+                        class="bead-label whitespace-nowrap font-sans text-[10px] md:text-xs uppercase tracking-widest font-bold text-accent"
+                        data-tab-label="shalat"
+                        >Shalat</span
+                    >
+                    <span></span>
+                    <span
+                        class="bead-label whitespace-nowrap font-sans text-[10px] md:text-xs uppercase tracking-widest font-medium text-primary/30"
+                        data-tab-label="quran"
+                        >Quran</span
+                    >
+                    <span></span>
+                    <span
+                        class="bead-label whitespace-nowrap font-sans text-[10px] md:text-xs uppercase tracking-widest font-medium text-primary/30"
+                        data-tab-label="puasa"
+                        >Puasa</span
+                    >
+                    <span></span>
+                    <span
+                        class="bead-label whitespace-nowrap font-sans text-[10px] md:text-xs uppercase tracking-widest font-medium text-primary/30"
+                        data-tab-label="dzikir"
+                        >Dzikir</span
+                    >
+                </nav>
+            </div>
+
+            <!-- ==================== TAB: SHALAT ==================== -->
+            <div
+                id="tab-shalat"
+                class="tab-content active animate-fade-up opacity-0 delay-500"
+            >
+                <div
+                    class="glass-panel rounded-3xl p-8 md:p-12 relative overflow-hidden"
+                    style="
+                        background: rgba(255, 255, 255, 0.4);
+                        backdrop-filter: blur(16px);
+                        border: 1px solid rgba(27, 67, 50, 0.08);
+                    "
+                >
+                    <div
+                        class="absolute -right-6 -bottom-6 font-arabic text-[8rem] text-primary/[0.02] pointer-events-none select-none leading-none"
+                    >
+                        صلاة
+                    </div>
+
+                    <div class="flex items-center gap-3 mb-10">
+                        <span
+                            class="material-symbols-outlined text-accent text-lg"
+                            >mosque</span
+                        >
+                        <h2
+                            class="font-serif text-2xl md:text-3xl font-bold text-primary"
+                        >
+                            Shalat Wajib
+                        </h2>
+                    </div>
+
+                    <!-- 5 Pillars Timeline -->
+                    <div class="flex flex-col gap-0 relative pl-8 md:pl-12">
+                        <!-- Timeline Line -->
+                        <div
+                            class="absolute left-[25px] md:left-[35px] top-[26px] bottom-[26px] w-[2px] bg-primary/10"
+                        >
+                            <div
+                                id="shalat-timeline-fill"
+                                class="w-full bg-accent transition-all duration-700 rounded-full"
+                                style="height: 0%"
+                            ></div>
+                        </div>
+
+                        <!-- Subuh -->
+                        <div
+                            class="flex items-center gap-6 py-5 relative shalat-row"
+                            data-shalat="subuh"
+                        >
+                            <div
+                                class="timeline-node z-10"
+                                onclick="toggleShalat('subuh')"
+                            >
+                                <span
+                                    class="node-icon material-symbols-outlined text-primary/30"
+                                    style="font-size: 20px !important"
+                                    >wb_twilight</span
+                                >
+                            </div>
+                            <div class="flex-1">
+                                <h3
+                                    class="font-sans text-base font-semibold text-primary"
+                                >
+                                    Subuh
+                                </h3>
+                                <p
+                                    class="font-sans text-xs text-primary/40 mt-0.5"
+                                >
+                                    04:30 — Fajar menyingsing
+                                </p>
+                            </div>
+                            <div
+                                class="shalat-check-icon opacity-0 transition-opacity duration-500"
+                            >
+                                <span
+                                    class="material-symbols-outlined text-accent"
+                                    style="font-size: 20px !important"
+                                    >check_circle</span
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Dzuhur -->
+                        <div
+                            class="flex items-center gap-6 py-5 relative shalat-row"
+                            data-shalat="dzuhur"
+                        >
+                            <div
+                                class="timeline-node z-10"
+                                onclick="toggleShalat('dzuhur')"
+                            >
+                                <span
+                                    class="node-icon material-symbols-outlined text-primary/30"
+                                    style="font-size: 20px !important"
+                                    >light_mode</span
+                                >
+                            </div>
+                            <div class="flex-1">
+                                <h3
+                                    class="font-sans text-base font-semibold text-primary"
+                                >
+                                    Dzuhur
+                                </h3>
+                                <p
+                                    class="font-sans text-xs text-primary/40 mt-0.5"
+                                >
+                                    12:00 — Matahari di puncak
+                                </p>
+                            </div>
+                            <div
+                                class="shalat-check-icon opacity-0 transition-opacity duration-500"
+                            >
+                                <span
+                                    class="material-symbols-outlined text-accent"
+                                    style="font-size: 20px !important"
+                                    >check_circle</span
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Ashar -->
+                        <div
+                            class="flex items-center gap-6 py-5 relative shalat-row"
+                            data-shalat="ashar"
+                        >
+                            <div
+                                class="timeline-node z-10"
+                                onclick="toggleShalat('ashar')"
+                            >
+                                <span
+                                    class="node-icon material-symbols-outlined text-primary/30"
+                                    style="font-size: 20px !important"
+                                    >wb_sunny</span
+                                >
+                            </div>
+                            <div class="flex-1">
+                                <h3
+                                    class="font-sans text-base font-semibold text-primary"
+                                >
+                                    Ashar
+                                </h3>
+                                <p
+                                    class="font-sans text-xs text-primary/40 mt-0.5"
+                                >
+                                    15:15 — Bayangan memanjang
+                                </p>
+                            </div>
+                            <div
+                                class="shalat-check-icon opacity-0 transition-opacity duration-500"
+                            >
+                                <span
+                                    class="material-symbols-outlined text-accent"
+                                    style="font-size: 20px !important"
+                                    >check_circle</span
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Maghrib -->
+                        <div
+                            class="flex items-center gap-6 py-5 relative shalat-row"
+                            data-shalat="maghrib"
+                        >
+                            <div
+                                class="timeline-node z-10"
+                                onclick="toggleShalat('maghrib')"
+                            >
+                                <span
+                                    class="node-icon material-symbols-outlined text-primary/30"
+                                    style="font-size: 20px !important"
+                                    >wb_twilight</span
+                                >
+                            </div>
+                            <div class="flex-1">
+                                <h3
+                                    class="font-sans text-base font-semibold text-primary"
+                                >
+                                    Maghrib
+                                </h3>
+                                <p
+                                    class="font-sans text-xs text-primary/40 mt-0.5"
+                                >
+                                    18:05 — Matahari terbenam
+                                </p>
+                            </div>
+                            <div
+                                class="shalat-check-icon opacity-0 transition-opacity duration-500"
+                            >
+                                <span
+                                    class="material-symbols-outlined text-accent"
+                                    style="font-size: 20px !important"
+                                    >check_circle</span
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Isya -->
+                        <div
+                            class="flex items-center gap-6 py-5 relative shalat-row"
+                            data-shalat="isya"
+                        >
+                            <div
+                                class="timeline-node z-10"
+                                onclick="toggleShalat('isya')"
+                            >
+                                <span
+                                    class="node-icon material-symbols-outlined text-primary/30"
+                                    style="font-size: 20px !important"
+                                    >nightlight</span
+                                >
+                            </div>
+                            <div class="flex-1">
+                                <h3
+                                    class="font-sans text-base font-semibold text-primary"
+                                >
+                                    Isya
+                                </h3>
+                                <p
+                                    class="font-sans text-xs text-primary/40 mt-0.5"
+                                >
+                                    19:15 — Malam menyelimuti
+                                </p>
+                            </div>
+                            <div
+                                class="shalat-check-icon opacity-0 transition-opacity duration-500"
+                            >
+                                <span
+                                    class="material-symbols-outlined text-accent"
+                                    style="font-size: 20px !important"
+                                    >check_circle</span
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shalat Progress -->
+                    <div class="mt-10 flex flex-col gap-4">
+                        <div class="flex items-center justify-between">
+                            <span
+                                class="font-sans text-xs uppercase tracking-widest text-primary/40 font-semibold"
+                                >Progress Shalat</span
+                            >
+                            <span
+                                id="shalat-progress-text"
+                                class="font-sans text-sm font-bold text-accent"
+                                >0 / 5</span
+                            >
+                        </div>
+                        <div
+                            class="w-full h-2 rounded-full bg-primary/5 overflow-hidden"
+                        >
+                            <div
+                                id="shalat-progress-bar"
+                                class="progress-fill h-full rounded-full bg-gradient-to-r from-accent/80 to-accent"
+                                style="width: 0%"
+                            ></div>
+                        </div>
+                        <div
+                            id="shalat-status"
+                            class="font-sans text-xs text-primary/50 italic mt-1"
+                        >
+                            Belum ada shalat yang dicatat hari ini
+                        </div>
+                    </div>
+
+                    <!-- Save Button -->
+                    <div class="mt-8 flex justify-end">
+                        <button
+                            onclick="saveShalat()"
+                            class="group relative px-10 py-3.5 bg-accent text-primary rounded-full font-sans overflow-hidden transform active:scale-95 transition-all duration-300 shadow-[0_0_15px_rgba(212,175,55,0.15)]"
+                        >
+                            <div
+                                class="absolute inset-0 overflow-hidden rounded-full pointer-events-none"
+                            >
+                                <div
+                                    class="absolute left-1/2 bottom-0 w-[150%] aspect-square -translate-x-1/2 translate-y-1/2 bg-primary rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 ease-out"
+                                ></div>
+                            </div>
+                            <span
+                                class="relative z-10 font-bold tracking-widest uppercase text-xs flex items-center gap-2 group-hover:text-white transition-colors duration-300"
+                            >
+                                <span
+                                    class="material-symbols-outlined"
+                                    style="font-size: 16px !important"
+                                    >save</span
+                                >
+                                Simpan
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quran -->
+            <div id="tab-quran" class="tab-content">
+                <div
+                    class="glass-panel rounded-3xl p-8 md:p-12 relative overflow-hidden"
+                    style="
+                        background: rgba(255, 255, 255, 0.4);
+                        backdrop-filter: blur(16px);
+                        border: 1px solid rgba(27, 67, 50, 0.08);
+                    "
+                >
+                    <div
+                        class="absolute -right-6 -bottom-6 font-arabic text-[8rem] text-primary/[0.02] pointer-events-none select-none leading-none"
+                    >
+                        قرآن
+                    </div>
+
+                    <div class="flex items-center gap-3 mb-10">
+                        <span
+                            class="material-symbols-outlined text-accent text-lg"
+                            >menu_book</span
+                        >
+                        <h2
+                            class="font-serif text-2xl md:text-3xl font-bold text-primary"
+                        >
+                            Baca Al-Qur'an
+                        </h2>
+                    </div>
+
+                    <!-- Natural Language Input -->
+                    <div
+                        class="text-xl md:text-2xl text-primary leading-[2] font-serif mb-10"
+                    >
+                        <span class="text-accent italic">Hari ini,</span> saya
+                        menargetkan membaca
+                        <input
+                            type="number"
+                            id="quran-target"
+                            class="story-input w-16 md:w-20 text-xl md:text-2xl mx-1 pb-1"
+                            placeholder="10"
+                            min="1"
+                            oninput="updateQuranProgress()"
+                        />
+                        halaman. Dan Alhamdulillah, sudah membaca
+                        <input
+                            type="number"
+                            id="quran-read"
+                            class="story-input w-16 md:w-20 text-xl md:text-2xl mx-1 pb-1"
+                            placeholder="0"
+                            min="0"
+                            oninput="updateQuranProgress()"
+                        />
+                        halaman.
+                    </div>
+
+                    <!-- Quran Progress Visual -->
+                    <div class="flex flex-col gap-6">
+                        <!-- Book Stack Visual -->
+                        <div class="flex items-end gap-6 justify-center py-6">
+                            <div class="flex flex-col items-center gap-2">
+                                <div
+                                    id="quran-book-unread"
+                                    class="w-20 md:w-28 bg-gradient-to-b from-primary/15 to-primary/5 rounded-lg transition-all duration-700 flex items-end justify-center pb-2 border border-primary/10"
+                                    style="height: 120px"
+                                >
+                                    <span
+                                        class="font-sans text-[9px] uppercase tracking-widest text-primary/30 font-bold"
+                                        >Sisa</span
+                                    >
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-center gap-3">
+                                <span
+                                    id="quran-progress-pct"
+                                    class="font-serif text-4xl md:text-5xl font-bold text-primary"
+                                    >0%</span
+                                >
+                                <span
+                                    class="font-sans text-[10px] uppercase tracking-widest text-primary/40 font-semibold"
+                                    >Tercapai</span
+                                >
+                            </div>
+                            <div class="flex flex-col items-center gap-2">
+                                <div
+                                    id="quran-book-read"
+                                    class="w-20 md:w-28 bg-gradient-to-b from-accent/30 to-accent/10 rounded-lg transition-all duration-700 flex items-end justify-center pb-2 border border-accent/20"
+                                    style="height: 0px"
+                                >
+                                    <span
+                                        class="font-sans text-[9px] uppercase tracking-widest text-accent font-bold"
+                                        >Dibaca</span
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="flex items-center justify-between mb-2">
+                            <span
+                                class="font-sans text-xs uppercase tracking-widest text-primary/40 font-semibold"
+                                >Progress Bacaan</span
+                            >
+                            <span
+                                id="quran-pages-text"
+                                class="font-sans text-sm font-bold text-accent"
+                                >0 / 0 halaman</span
+                            >
+                        </div>
+                        <div
+                            class="w-full h-2 rounded-full bg-primary/5 overflow-hidden"
+                        >
+                            <div
+                                id="quran-progress-bar"
+                                class="progress-fill h-full rounded-full bg-gradient-to-r from-accent/80 to-accent"
+                                style="width: 0%"
+                            ></div>
+                        </div>
+
+                        <!-- Status -->
+                        <div
+                            id="quran-status"
+                            class="font-sans text-xs text-primary/50 italic mt-1"
+                        >
+                            Masukkan target dan halaman yang sudah dibaca
+                        </div>
+
+                        <!-- Mark Complete -->
+                        <label
+                            class="flex items-center gap-3 mt-4 cursor-pointer group w-fit"
+                        >
+                            <input
+                                type="checkbox"
+                                id="quran-complete"
+                                class="sr-only peer"
+                                onchange="updateQuranProgress()"
+                            />
+                            <div
+                                class="w-5 h-5 rounded border-2 border-primary/20 peer-checked:bg-accent peer-checked:border-accent transition-all duration-300 flex items-center justify-center"
+                            >
+                                <span
+                                    class="material-symbols-outlined text-primary opacity-0 peer-checked:opacity-100 transition-opacity"
+                                    style="font-size: 14px !important"
+                                    >check</span
+                                >
+                            </div>
+                            <span
+                                class="font-sans text-sm text-primary/60 group-hover:text-primary transition-colors"
+                                >Tandai target hari ini selesai</span
+                            >
+                        </label>
+                    </div>
+
+                    <!-- Save Button -->
+                    <div class="mt-8 flex justify-end">
+                        <button
+                            onclick="saveQuran()"
+                            class="group relative px-10 py-3.5 bg-accent text-primary rounded-full font-sans overflow-hidden transform active:scale-95 transition-all duration-300 shadow-[0_0_15px_rgba(212,175,55,0.15)]"
+                        >
+                            <div
+                                class="absolute inset-0 overflow-hidden rounded-full pointer-events-none"
+                            >
+                                <div
+                                    class="absolute left-1/2 bottom-0 w-[150%] aspect-square -translate-x-1/2 translate-y-1/2 bg-primary rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 ease-out"
+                                ></div>
+                            </div>
+                            <span
+                                class="relative z-10 font-bold tracking-widest uppercase text-xs flex items-center gap-2 group-hover:text-white transition-colors duration-300"
+                            >
+                                <span
+                                    class="material-symbols-outlined"
+                                    style="font-size: 16px !important"
+                                    >save</span
+                                >
+                                Simpan
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Puasa -->
+            <div id="tab-puasa" class="tab-content">
+                <div
+                    class="glass-panel rounded-3xl p-8 md:p-12 relative overflow-hidden"
+                    style="
+                        background: rgba(255, 255, 255, 0.4);
+                        backdrop-filter: blur(16px);
+                        border: 1px solid rgba(27, 67, 50, 0.08);
+                    "
+                >
+                    <div
+                        class="absolute -right-6 -bottom-6 font-arabic text-[8rem] text-primary/[0.02] pointer-events-none select-none leading-none"
+                    >
+                        صوم
+                    </div>
+
+                    <div
+                        class="flex items-center justify-between mb-10 flex-wrap gap-4"
+                    >
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="material-symbols-outlined text-accent text-lg"
+                                >calendar_month</span
+                            >
+                            <h2
+                                class="font-serif text-2xl md:text-3xl font-bold text-primary"
+                            >
+                                Puasa Ramadhan
+                            </h2>
+                        </div>
+                        <div
+                            class="flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20"
+                        >
+                            <span
+                                class="material-symbols-outlined text-accent"
+                                style="font-size: 16px !important"
+                                >today</span
+                            >
+                            <span
+                                id="ramadhan-day-label"
+                                class="font-sans text-xs font-bold text-accent uppercase tracking-wider"
+                                >Hari ke-1</span
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Today Check -->
+                    <div
+                        class="mb-10 p-5 rounded-2xl bg-primary/[0.03] border border-primary/5 flex items-center gap-4"
+                    >
+                        <button
+                            id="btn-puasa-today"
+                            onclick="togglePuasaToday()"
+                            class="w-12 h-12 rounded-full border-2 border-primary/20 flex items-center justify-center transition-all duration-500 hover:border-accent hover:scale-105 shrink-0"
+                        >
+                            <span
+                                class="material-symbols-outlined text-primary/30 transition-colors"
+                                style="font-size: 24px !important"
+                                id="puasa-today-icon"
+                                >radio_button_unchecked</span
+                            >
+                        </button>
+                        <div>
+                            <h3
+                                class="font-sans text-sm font-bold text-primary"
+                            >
+                                Sudah puasa hari ini?
+                            </h3>
+                            <p class="font-sans text-xs text-primary/40 mt-0.5">
+                                Ketuk untuk menandai puasa hari ini
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Constellation Calendar -->
+                    <div class="mb-8">
+                        <h3
+                            class="font-sans text-xs uppercase tracking-widest text-primary/40 font-semibold mb-6"
+                        >
+                            Konstelasi Ramadhan — 30 Hari
+                        </h3>
+                        <div
+                            id="constellation-grid"
+                            class="grid grid-cols-6 sm:grid-cols-10 gap-3 justify-items-center"
+                        >
+                            <!-- Generated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Puasa Progress -->
+                    <div class="flex flex-col gap-4 mt-8">
+                        <div class="flex items-center justify-between">
+                            <span
+                                class="font-sans text-xs uppercase tracking-widest text-primary/40 font-semibold"
+                                >Progress Puasa</span
+                            >
+                            <span
+                                id="puasa-progress-text"
+                                class="font-sans text-sm font-bold text-accent"
+                                >0 / 30 hari</span
+                            >
+                        </div>
+                        <div
+                            class="w-full h-2 rounded-full bg-primary/5 overflow-hidden"
+                        >
+                            <div
+                                id="puasa-progress-bar"
+                                class="progress-fill h-full rounded-full bg-gradient-to-r from-accent/80 to-accent"
+                                style="width: 0%"
+                            ></div>
+                        </div>
+                        <div
+                            id="puasa-status"
+                            class="font-sans text-xs text-primary/50 italic mt-1"
+                        >
+                            Belum ada hari puasa yang dicatat
+                        </div>
+                    </div>
+
+                    <!-- Save Button -->
+                    <div class="mt-8 flex justify-end">
+                        <button
+                            onclick="savePuasa()"
+                            class="group relative px-10 py-3.5 bg-accent text-primary rounded-full font-sans overflow-hidden transform active:scale-95 transition-all duration-300 shadow-[0_0_15px_rgba(212,175,55,0.15)]"
+                        >
+                            <div
+                                class="absolute inset-0 overflow-hidden rounded-full pointer-events-none"
+                            >
+                                <div
+                                    class="absolute left-1/2 bottom-0 w-[150%] aspect-square -translate-x-1/2 translate-y-1/2 bg-primary rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 ease-out"
+                                ></div>
+                            </div>
+                            <span
+                                class="relative z-10 font-bold tracking-widest uppercase text-xs flex items-center gap-2 group-hover:text-white transition-colors duration-300"
+                            >
+                                <span
+                                    class="material-symbols-outlined"
+                                    style="font-size: 16px !important"
+                                    >save</span
+                                >
+                                Simpan
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== TAB: DZIKIR ==================== -->
+            <div id="tab-dzikir" class="tab-content">
+                <div
+                    class="glass-panel rounded-3xl p-8 md:p-12 relative overflow-hidden text-center"
+                    style="
+                        background: rgba(255, 255, 255, 0.4);
+                        backdrop-filter: blur(16px);
+                        border: 1px solid rgba(27, 67, 50, 0.08);
+                    "
+                >
+                    <div
+                        class="absolute -right-6 -bottom-6 font-arabic text-[8rem] text-primary/[0.02] pointer-events-none select-none leading-none"
+                    >
+                        ذكر
+                    </div>
+
+                    <div class="flex flex-col items-center gap-6 py-8">
+                        <div
+                            class="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center border border-accent/20"
+                        >
+                            <span
+                                class="material-symbols-outlined text-accent text-3xl"
+                                >prayer_times</span
+                            >
+                        </div>
+                        <h2
+                            class="font-serif text-2xl md:text-3xl font-bold text-primary"
+                        >
+                            Dzikir Harian
+                        </h2>
+                        <p
+                            class="font-sans text-sm text-primary/50 max-w-md leading-relaxed"
+                        >
+                            Gunakan Zikir Counter untuk menghitung dzikir
+                            harianmu. SubhanAllah, Alhamdulillah, dan Allahu
+                            Akbar.
+                        </p>
+
+                        <a
+                            href="zikir.html"
+                            class="group relative mt-4 px-12 py-4 bg-primary text-surface rounded-full font-sans overflow-hidden transform active:scale-95 transition-all duration-300 shadow-[0_20px_60px_rgba(27,67,50,0.2)] inline-flex items-center"
+                        >
+                            <div
+                                class="absolute inset-0 overflow-hidden rounded-full pointer-events-none"
+                            >
+                                <div
+                                    class="absolute left-1/2 bottom-0 w-[150%] aspect-square -translate-x-1/2 translate-y-1/2 bg-accent rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 ease-out"
+                                ></div>
+                            </div>
+                            <span
+                                class="relative z-10 font-bold tracking-widest uppercase text-xs flex items-center gap-3 group-hover:text-primary transition-colors duration-300"
+                            >
+                                Buka Zikir Counter
+                                <svg class="w-5 h-5 transform group-hover:rotate-12 transition-transform duration-500 flex-shrink-0"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                        stroke-dasharray="0.1 4.5"
+                                        d="M12 2 C16.5 2 19.5 5.5 19.5 10 C19.5 14.5 14 18 12 20 C10 18 4.5 14.5 4.5 10 C4.5 5.5 7.5 2 12 2 Z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M12 20v4M10 23l2-3l2 3" />
+                                </svg>
+                            </span>
+                        </a>
+
+                        <p
+                            class="font-sans text-[10px] text-primary/30 mt-4 tracking-wider uppercase"
+                        >
+                            Progress dzikir dihitung otomatis dari Zikir Counter
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer
+            class="relative z-10 w-full pb-8 text-center pointer-events-none mt-12"
+        >
+            <div
+                class="flex items-center justify-center gap-3 font-sans text-[10px] text-primary/40 tracking-wide"
+            >
+                <span>&copy; 1447H Noor Ramadhan</span>
+                <span class="w-[3px] h-[3px] rounded-full bg-primary/20"></span>
+                <a
+                    href="../index.html"
+                    class="pointer-events-auto hover:text-accent transition-colors duration-300"
+                    >Doa Sahur & Buka</a
+                >
+                <span class="w-[3px] h-[3px] rounded-full bg-primary/20"></span>
+                <a
+                    href="zakat.html"
+                    class="pointer-events-auto hover:text-accent transition-colors duration-300"
+                    >Kalkulator Zakat</a
+                >
+                <span class="w-[3px] h-[3px] rounded-full bg-primary/20"></span>
+                <a
+                    href="zikir.html"
+                    class="pointer-events-auto hover:text-accent transition-colors duration-300"
+                    >Zikir Counter</a
+                >
+            </div>
+        </footer>
+
+        <!-- Toast Notification -->
+        <div
+            id="toast-save"
+            class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] bg-primary text-surface px-6 py-4 rounded-2xl shadow-[0_20px_50px_rgba(27,67,50,0.3)] border border-white/10 flex items-center gap-3 opacity-0 translate-y-10 pointer-events-none transition-all duration-500"
+        >
+            <span
+                class="material-symbols-outlined text-accent shrink-0"
+                style="font-size: 20px !important"
+                >check_circle</span
+            >
+            <span
+                id="toast-save-message"
+                class="font-sans text-sm font-semibold tracking-wide"
+                >Data berhasil disimpan!</span
+            >
+        </div>
+
+        <!-- Scripts -->
+        <script src="../public/assets/js/todolist.js"></script>
+
+        <!-- Gold Particles -->
+        <script>
+            (function () {
+                const canvas = document.getElementById("particle-canvas");
+                if (!canvas) return;
+                const ctx = canvas.getContext("2d");
+                let W, H;
+                const PARTICLE_COUNT = 30;
+
+                function resize() {
+                    W = canvas.width = window.innerWidth;
+                    H = canvas.height = window.innerHeight;
+                }
+                resize();
+                window.addEventListener("resize", resize);
+
+                const GOLD_COLORS = [
+                    [212, 175, 55],
+                    [218, 190, 80],
+                    [195, 155, 40],
+                    [230, 200, 100],
+                ];
+
+                class Particle {
+                    constructor() {
+                        this.reset(true);
+                    }
+                    reset(initial) {
+                        this.x = Math.random() * W;
+                        this.y = initial ? Math.random() * H : -10;
+                        this.size = Math.random() * 2.5 + 1;
+                        this.speedY = Math.random() * 0.3 + 0.1;
+                        this.speedX = (Math.random() - 0.5) * 0.2;
+                        this.opacity = Math.random() * 0.3 + 0.1;
+                        this.color =
+                            GOLD_COLORS[
+                                Math.floor(Math.random() * GOLD_COLORS.length)
+                            ];
+                        this.shimmer = Math.random() * Math.PI * 2;
+                        this.shimmerSpeed = Math.random() * 0.02 + 0.01;
+                    }
+                    update() {
+                        this.shimmer += this.shimmerSpeed;
+                        this.x += this.speedX;
+                        this.y += this.speedY;
+                        if (this.y > H + 20 || this.x < -30 || this.x > W + 30)
+                            this.reset(false);
+                    }
+                    draw() {
+                        ctx.save();
+                        ctx.globalAlpha =
+                            this.opacity * (0.7 + Math.sin(this.shimmer) * 0.3);
+                        let [r, g, b] = this.color;
+                        ctx.fillStyle = `rgba(${r},${g},${b},1)`;
+                        ctx.beginPath();
+                        let s = this.size;
+                        ctx.moveTo(this.x, this.y - s);
+                        ctx.lineTo(this.x + s * 0.6, this.y);
+                        ctx.lineTo(this.x, this.y + s);
+                        ctx.lineTo(this.x - s * 0.6, this.y);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.restore();
+                    }
+                }
+
+                let particles = [];
+                for (let i = 0; i < PARTICLE_COUNT; i++)
+                    particles.push(new Particle());
+
+                function animate() {
+                    ctx.clearRect(0, 0, W, H);
+                    for (let p of particles) {
+                        p.update();
+                        p.draw();
+                    }
+                    requestAnimationFrame(animate);
+                }
+                animate();
+            })();
+        </script>
+    </body>
+</html>
