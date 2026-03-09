@@ -22,6 +22,14 @@ async function initDropdown() {
     const arrow = document.getElementById('city-dropdown-arrow');
     const cityText = document.getElementById('city-dropdown-text');
     const searchInput = document.getElementById('city-search-input');
+    const monthYearText = document.getElementById('current-month-year');
+
+    // Set Header Month & Year
+    if (monthYearText) {
+        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        const monthName = months[parseInt(MONTH) - 1];
+        monthYearText.innerText = `${monthName} ${YEAR}`;
+    }
 
     // Set initial text
     if (cityText) cityText.innerText = ACTIVE_CITY_NAME;
@@ -228,7 +236,6 @@ function renderTable(jadwal) {
                 <div class="flex flex-col gap-1 items-center lg:items-start">
                     <div class="flex items-center gap-3">
                         <span class="font-serif text-2xl font-bold ${isToday ? 'text-background' : 'text-primary'}">${formatDate(day.tanggal)}</span>
-                        ${isToday ? '<span class="w-2 h-2 bg-accent rounded-full animate-pulse shadow-[0_0_8px_rgba(212,175,55,0.6)]"></span>' : ''}
                     </div>
                 </div>
             </td>
@@ -267,7 +274,8 @@ function formatDate(tanggalStr) {
     const day = dateParts[0];
     const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
     const month = months[parseInt(dateParts[1]) - 1];
-    return `${day} ${month}`;
+    const year = dateParts[2] || YEAR;
+    return `${day} ${month} ${year}`;
 }
 
 // Map Indonesian regions to their timezones
