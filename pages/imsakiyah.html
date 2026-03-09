@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Imsakiyah | Noor Ramadhan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="../src/output.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0" rel="stylesheet" />
+
+    <style>
+        /* Zakat-Style Background Elements */
+        .geo-grid {
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%231B4332' stroke-width='0.5' opacity='0.35'%3E%3Cpath d='M40 10 L50 30 L70 40 L50 50 L40 70 L30 50 L10 40 L30 30 Z'/%3E%3Cpath d='M40 10 L50 30 L70 40 L50 50 L40 70 L30 50 L10 40 L30 30 Z' transform='rotate(45 40 40)'/%3E%3Ccircle cx='40' cy='40' r='8'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: 80px 80px;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .light-ray {
+            position: fixed;
+            top: -20%;
+            right: 10%;
+            width: 300px;
+            height: 140vh;
+            background: linear-gradient(180deg, transparent 0%, rgba(212, 175, 55, 0.03) 30%, rgba(255, 255, 255, 0.04) 50%, rgba(212, 175, 55, 0.02) 70%, transparent 100%);
+            transform: rotate(25deg);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #particle-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Architectural Table - Solid Plate Edition */
+        .table-outer-container {
+            background: #fbfcf9;
+            border: 1px solid rgba(27, 67, 50, 0.1);
+            border-radius: 24px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            box-shadow: 20px 20px 60px rgba(27, 67, 50, 0.03);
+        }
+
+        .table-slab {
+            background: #fbfcf9; /* Subtle Off-white Green Tint */
+            border-bottom: 1px solid rgba(27, 67, 50, 0.05);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .table-slab:hover {
+            transform: scale(1.005);
+            background: #ffffff;
+            z-index: 10;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(27, 67, 50, 0.05);
+        }
+
+        .table-slab.today {
+            background: #1B4332;
+            border-color: #1B4332;
+        }
+
+        /* Header Plate Styling - Royal Edition */
+        .header-plate {
+            background: #1B4332 !important; /* Primary Green */
+            color: #D4AF37 !important;    /* Accent Gold */
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-plate:first-child { border-left: none; }
+
+        .header-plate::after {
+            content: '';
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(212, 175, 55, 0.5);
+            border-radius: 50%;
+            top: 10px;
+            right: 10px;
+            box-shadow: -15px 0 0 rgba(212, 175, 55, 0.2);
+        }
+
+        .header-coord {
+            font-family: 'Sora', sans-serif;
+            font-size: 8px;
+            font-weight: 800;
+            opacity: 0.4;
+            letter-spacing: 0.1em;
+            margin-right: 8px;
+        }
+
+        /* Decorative Intersections */
+        .grid-dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(212, 175, 55, 0.4);
+            border-radius: 50%;
+        }
+
+        .corner-tl { top: -2px; left: -2px; }
+        .corner-tr { top: -2px; right: -2px; }
+        .corner-bl { bottom: -2px; left: -2px; }
+        .corner-br { bottom: -2px; right: -2px; }
+
+        @keyframes rowEntrance {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .stagger-row {
+            opacity: 0;
+            animation: rowEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Islamic Crescent Moon Loader */
+        @keyframes crescentFloat {
+            0%, 100% { transform: translateY(0) rotate(-15deg); }
+            50% { transform: translateY(-10px) rotate(-10deg); }
+        }
+        @keyframes crescentGlow {
+            0%, 100% { filter: drop-shadow(0 0 15px rgba(212,175,55,0.3)); }
+            50% { filter: drop-shadow(0 0 30px rgba(212,175,55,0.6)); }
+        }
+        @keyframes starOrbit1 {
+            0% { transform: rotate(0deg) translateX(90px) rotate(0deg) scale(1); opacity: 0.8; }
+            50% { opacity: 1; transform: rotate(180deg) translateX(90px) rotate(-180deg) scale(1.3); }
+            100% { transform: rotate(360deg) translateX(90px) rotate(-360deg) scale(1); opacity: 0.8; }
+        }
+        @keyframes starOrbit2 {
+            0% { transform: rotate(120deg) translateX(70px) rotate(-120deg) scale(1); opacity: 0.6; }
+            50% { opacity: 1; transform: rotate(300deg) translateX(70px) rotate(-300deg) scale(1.2); }
+            100% { transform: rotate(480deg) translateX(70px) rotate(-480deg) scale(1); opacity: 0.6; }
+        }
+        @keyframes starOrbit3 {
+            0% { transform: rotate(240deg) translateX(110px) rotate(-240deg) scale(0.8); opacity: 0.4; }
+            50% { opacity: 0.9; transform: rotate(420deg) translateX(110px) rotate(-420deg) scale(1.1); }
+            100% { transform: rotate(600deg) translateX(110px) rotate(-600deg) scale(0.8); opacity: 0.4; }
+        }
+        @keyframes starTwinkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.6); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        #loader.active { opacity: 1; pointer-events: auto; }
+
+        .crescent-moon {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: transparent;
+            box-shadow: inset -20px 5px 0 4px #D4AF37;
+            animation: crescentFloat 4s ease-in-out infinite, crescentGlow 3s ease-in-out infinite;
+        }
+        .orbit-star {
+            position: absolute; width: 6px; height: 6px;
+            background: #D4AF37; border-radius: 50%;
+            box-shadow: 0 0 8px rgba(212,175,55,0.6);
+        }
+        .orbit-star-1 { animation: starOrbit1 8s linear infinite; }
+        .orbit-star-2 { animation: starOrbit2 10s linear infinite; }
+        .orbit-star-3 { animation: starOrbit3 12s linear infinite; width: 4px; height: 4px; }
+        .static-star {
+            position: absolute; width: 3px; height: 3px;
+            background: #D4AF37; border-radius: 50%;
+        }
+        .loading-text { letter-spacing: 0.5em; opacity: 0.6; margin-top: 3rem; }
+        .error-crescent {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: transparent;
+            box-shadow: inset -16px 4px 0 3px rgba(27,67,50,0.15);
+        }
+    </style>
+</head>
+
+<body class="text-primary font-sans min-h-screen relative selection:bg-accent selection:text-background" style="background: linear-gradient(170deg, #FCF9F2 0%, #F5F0E8 40%, #EEF2EC 100%);">
+
+    <!-- Zakat-style Background Layers -->
+    <div class="fixed inset-0 z-0 bg-grain opacity-[0.05] pointer-events-none" style="background-image: url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E&quot;);"></div>
+    <div class="geo-grid"></div>
+    <div class="light-ray"></div>
+
+    <!-- Islamic Crescent Moon Loading Overlay -->
+    <div id="loader" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#FCF9F2]/95 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]">
+        
+        <div class="relative w-[240px] h-[240px] flex items-center justify-center">
+            
+            <!-- Orbiting Stars -->
+            <div class="orbit-star orbit-star-1"></div>
+            <div class="orbit-star orbit-star-2"></div>
+            <div class="orbit-star orbit-star-3"></div>
+
+            <!-- Static Twinkling Stars -->
+            <div class="static-star" style="top: 15%; left: 20%; animation: starTwinkle 2s ease-in-out infinite;"></div>
+            <div class="static-star" style="top: 25%; right: 15%; animation: starTwinkle 3s ease-in-out infinite 0.5s;"></div>
+            <div class="static-star" style="bottom: 30%; left: 10%; animation: starTwinkle 2.5s ease-in-out infinite 1s;"></div>
+            <div class="static-star" style="bottom: 15%; right: 25%; animation: starTwinkle 3.5s ease-in-out infinite 1.5s;"></div>
+            <div class="static-star" style="top: 40%; left: 5%; animation: starTwinkle 4s ease-in-out infinite 0.8s; width: 2px; height: 2px;"></div>
+
+            <!-- Crescent Moon -->
+            <div class="crescent-moon"></div>
+            
+        </div>
+
+        <div class="font-sans text-[11px] uppercase tracking-[0.5em] text-primary/60 font-bold loading-text">
+            Memuat data...
+        </div>
+    </div>
+
+    <main class="relative z-10 min-h-screen px-4 sm:px-6 md:px-12 lg:px-24 py-8 md:py-24 max-w-[1800px] mx-auto opacity-0 translate-y-10 transition-all duration-1000 ease-out flex flex-col pt-32" id="main-content">
+        <header class="mb-12 md:mb-20 flex flex-col gap-4 md:gap-6 relative z-[60]">
+            <img src="../public/assets/images/logo3.png" alt="Noor Ramadhan Logo" class="h-10 md:h-10 w-auto object-contain self-start">
+            <h1 class="font-serif tracking-[-0.03em] font-bold leading-none text-primary m-0 flex flex-col items-start gap-2 md:gap-4">
+                <span class="text-[clamp(3.2rem,10vw,7rem)] leading-tight">Jadwal Imsakiyah</span>
+                <div class="flex flex-row items-baseline gap-x-3 sm:gap-x-6 md:gap-x-10 mt-1 md:mt-6 flex-wrap">
+                    <span class="font-serif italic text-xl sm:text-2xl md:text-5xl text-primary/30 lowercase">di</span>
+                    <div class="static md:relative inline-block text-left dropdown-wrapper z-[60]">
+                        <div id="trigger-city-dropdown" tabindex="0" class="cursor-pointer border-b-2 md:border-b-4 border-dashed border-accent/60 text-accent font-sans font-bold transition-all duration-300 hover:border-solid hover:border-primary flex items-center select-none outline-none focus:border-solid focus:border-primary group focus-within:ring-0 text-[clamp(1.2rem,5vw,4rem)] pb-1 md:pb-2">
+                            <span id="city-dropdown-text" class="truncate max-w-[60vw] md:max-w-none">Jakarta</span>
+                            <span id="city-dropdown-arrow" class="text-[0.4em] ml-2 md:ml-6 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] inline-block shrink-0">▼</span>
+                        </div>
+                        
+                        <!-- Sleek Searchable Floating Menu -->
+                        <div id="city-dropdown-menu" class="absolute top-[100%] inset-x-4 md:inset-x-auto mx-auto md:mx-0 md:left-0 md:-ml-0 mt-2 md:mt-3 w-auto md:w-[500px] lg:w-[600px] bg-white/95 backdrop-blur-2xl border border-primary/10 rounded-2xl shadow-[0_20px_40px_rgba(27,67,50,0.15)] opacity-0 translate-y-4 pointer-events-none transition-all duration-300 z-50 overflow-hidden transform origin-top leading-normal [&.active]:opacity-100 [&.active]:pointer-events-auto [&.active]:translate-y-0 p-2">
+                            <!-- Search Bar -->
+                            <div class="p-2 border-b border-primary/5 mb-2">
+                                <div class="relative flex items-center group">
+                                    <span class="material-symbols-outlined absolute left-3 text-primary/30 group-focus-within:text-accent transition-colors duration-300">search</span>
+                                    <input type="text" id="city-search-input" placeholder="Cari kota..." class="w-full bg-primary/5 border-none rounded-xl py-3 pl-10 pr-4 text-sm font-sans focus:ring-2 focus:ring-accent/30 outline-none transition-all duration-300 placeholder:text-primary/20">
+                                </div>
+                            </div>
+
+                            <!-- Scrollable City List -->
+                            <div id="city-list" class="flex flex-col gap-1 max-h-[220px] overflow-y-auto scrollbar-thin scrollbar-thumb-accent/20 pr-1">
+                                <!-- Initial State / Searching State -->
+                                <div id="city-list-loading" class="px-5 py-8 text-center flex flex-col items-center gap-3">
+                                    <div class="w-6 h-6 border-2 border-accent/30 border-t-accent rounded-full animate-spin"></div>
+                                    <span class="text-[10px] font-sans font-bold text-primary/40 uppercase tracking-widest">Sinkronisasi Astrolabe...</span>
+                                </div>
+                                <!-- Empty State -->
+                                <div id="city-list-empty" class="hidden px-5 py-8 text-center flex flex-col items-center gap-3">
+                                    <span class="material-symbols-outlined text-primary/30 text-3xl">location_off</span>
+                                    <span class="text-[10px] font-sans font-bold text-primary/40 uppercase tracking-widest">Kota tidak ditemukan</span>
+                                </div>
+                                <!-- Content injected by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h1>
+        </header>
+
+        <!-- Error State -->
+        <div id="error-state" class="hidden flex-col items-center justify-center py-24 md:py-32 px-8 text-center [&.active]:flex">
+            <!-- Dimmed Crescent Illustration -->
+            <div class="relative w-[160px] h-[160px] flex items-center justify-center mb-8">
+                <!-- Faded background glow -->
+                <div class="absolute inset-0 bg-primary/5 rounded-full blur-2xl"></div>
+                <!-- Dimmed crescent -->
+                <div class="error-crescent opacity-60"></div>
+                <!-- Broken connection icon overlaid -->
+                <div class="absolute bottom-2 right-4 bg-[#FCF9F2] rounded-full w-12 h-12 flex items-center justify-center shadow-[0_4px_12px_rgba(27,67,50,0.08)]">
+                    <span class="material-symbols-outlined text-2xl text-primary/40">wifi_off</span>
+                </div>
+                <!-- Static dim stars around the crescent -->
+                <div class="absolute top-[20%] left-[15%] w-2 h-2 bg-primary/10 rounded-full"></div>
+                <div class="absolute top-[30%] right-[20%] w-1.5 h-1.5 bg-primary/10 rounded-full"></div>
+                <div class="absolute bottom-[25%] left-[25%] w-1 h-1 bg-primary/10 rounded-full"></div>
+            </div>
+            <h3 class="font-serif font-bold text-2xl md:text-4xl mb-3 text-primary">Gagal Memuat Data</h3>
+            <p class="text-primary/50 text-sm md:text-base mb-8 max-w-md leading-relaxed">Mohon maaf, kami tidak dapat mengambil data jadwal sholat saat ini. Pastikan koneksi internet Anda terhubung dengan baik.</p>
+            <button onclick="fetchJadwal(ACTIVE_CITY_ID)" class="group px-8 py-3.5 bg-primary text-background rounded-full font-sans font-bold text-xs uppercase tracking-[0.2em] hover:bg-accent hover:text-primary transition-all duration-500 hover:shadow-[0_8px_24px_rgba(212,175,55,0.3)] flex items-center gap-3">
+                <span class="material-symbols-outlined text-lg transition-transform duration-500 group-hover:rotate-180">refresh</span>
+                Coba Lagi
+            </button>
+        </div>
+
+        <!-- Table UI -->
+        <section id="table-section" class="w-full mt-8 md:mt-16 relative block">
+            <div class="table-outer-container w-full pb-4">
+                <table class="w-full border-collapse text-left min-w-[800px]">
+                    <thead>
+                        <tr class="text-[10px] sm:text-[0.65rem] font-sans uppercase tracking-[0.1em] sm:tracking-[0.2em]">
+                            <th class="header-plate py-6 px-10">
+                                Tanggal
+                            </th>
+                            <th class="header-plate py-6 px-8">
+                                Imsak
+                            </th>
+                            <th class="header-plate py-6 px-8">
+                                Subuh
+                            </th>
+                            <th class="header-plate py-6 px-8">
+                                Dzuhur
+                            </th>
+                            <th class="header-plate py-6 px-8">
+                                Ashar
+                            </th>
+                            <th class="header-plate py-6 px-8">
+                                Maghrib
+                            </th>
+                            <th class="header-plate py-6 px-8">
+                                Isya
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="imsakiyah-tbody">
+                        <!-- Data rows injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <!-- Decoration Elements -->
+        <div class="fixed bottom-0 right-0 p-12 pointer-events-none opacity-[0.03] z-[-1]">
+            <img src="../public/assets/images/logo2.png" alt="Ornament" class="w-[40vw] max-w-lg filter grayscale">
+        </div>
+    </main>
+
+    <footer class="w-full relative mt-32 pb-0">
+
+        <!-- Moon -->
+        <div class="absolute -top-[3rem] md:-top-[4rem] left-1/2 -translate-x-1/2 z-30 drop-shadow-xl pointer-events-none mb-6 md:mb-10">
+            <img src="../public/assets/images/moonelement.png" alt="Moon Element"
+                class="w-20 md:w-28 h-20 md:h-28 object-contain transition-transform duration-1000 hover:scale-105"
+                style="animation: float 8s ease-in-out infinite; will-change: transform;">
+        </div>
+
+        <div
+            class="w-full bg-primary rounded-t-[2rem] relative overflow-hidden flex flex-col items-center pt-20 md:pt-28 pb-8 md:pb-10 px-6 md:px-8 lg:px-20 z-10">
+
+            <div class="absolute inset-0 opacity-10 pointer-events-none"
+                style="background-image: url('data:image/svg+xml,%3Csvg width=\'100%25\' height=\'100%25\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cdefs%3E%3Cpattern id=\'topography\' width=\'200\' height=\'200\' patternUnits=\'userSpaceOnUse\'%3E%3Cpath d=\'M0 100 Q 50 20 100 100 T 200 100\' fill=\'none\' stroke=\'%23D4AF37\' stroke-width=\'1\' opacity=\'0.8\'/%3E%3Cpath d=\'M0 120 Q 50 40 100 120 T 200 120\' fill=\'none\' stroke=\'%23D4AF37\' stroke-width=\'1\' opacity=\'0.6\'/%3E%3Cpath d=\'M0 140 Q 50 60 100 140 T 200 140\' fill=\'none\' stroke=\'%23D4AF37\' stroke-width=\'1\' opacity=\'0.4\'/%3E%3Cpath d=\'M0 160 Q 50 80 100 160 T 200 160\' fill=\'none\' stroke=\'%23D4AF37\' stroke-width=\'1\' opacity=\'0.2\'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width=\'100%25\' height=\'100%25\' fill=\'url(%23topography)\' /%3E%3C/svg%3E'); background-size: cover; background-position: center;">
+            </div>
+
+            <div
+                class="absolute top-[20%] left-1/2 -translate-x-1/2 w-[80vw] md:w-[60vw] h-[80vw] md:h-[60vw] max-w-[500px] max-h-[500px] bg-accent/10 blur-[80px] md:blur-[120px] rounded-full">
+            </div>
+
+            <div class="w-full max-w-[1400px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 md:gap-16 lg:gap-8 relative z-10 mb-12 md:mb-20">
+
+                <!-- Hubungi Kami -->
+                <div class="flex flex-col items-center md:items-start text-center md:text-left order-2 md:order-1">
+                    <h3 class="font-sans font-medium text-surface text-base md:text-lg mb-4 md:mb-6 tracking-wide">Hubungi Kami</h3>
+                    <div class="font-sans text-surface/60 font-light text-xs md:text-sm leading-relaxed mb-6 md:mb-8">
+                        <p>Masjid Raya Pusat</p>
+                        <p>Jl. Kebajikan No. 1447</p>
+                        <p>021 - 8899 7766</p>
+                        <a href="mailto:salam@royalramadan.com"
+                            class="hover:text-accent transition-colors border-b border-transparent hover:border-accent inline-block mt-2">salam@royalramadan.com</a>
+                    </div>
+
+                    <div class="flex items-center gap-4 text-surface/80 mt-2">
+                        <a href="#"
+                            class="w-10 h-10 flex items-center justify-center border border-surface/20 rounded-full hover:border-accent hover:text-accent hover:-translate-y-1 transition-all duration-300"
+                            aria-label="Instagram">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+                            </svg>
+                        </a>
+                        <a href="#"
+                            class="w-10 h-10 flex items-center justify-center border border-surface/20 rounded-full hover:border-accent hover:text-accent hover:-translate-y-1 transition-all duration-300"
+                            aria-label="YouTube">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path
+                                    d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" />
+                                <path d="M10 15V9l5 3-5 3z" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Logo -->
+                <div
+                    class="flex flex-col items-center justify-center text-center mt-6 md:mt-0 order-1 lg:order-2">
+                    <h3
+                        class="font-display text-5xl sm:text-6xl md:text-8xl lg:text-[5.5rem] text-surface mb-2 leading-none tracking-normal drop-shadow-sm">
+                        Noor Ramadhan
+                    </h3>
+                </div>
+
+                <!-- Akses Cepat -->
+                <div class="flex flex-col items-center md:items-end text-center md:text-right order-3 lg:order-3">
+                    <h3 class="font-sans font-medium text-surface text-base md:text-lg mb-4 md:mb-6 tracking-wide">Akses Cepat</h3>
+                    <div class="grid grid-cols-2 gap-x-8 md:gap-x-12 gap-y-3 font-sans text-surface/60 font-light text-xs md:text-sm w-full md:w-auto text-center md:text-right">
+                        <div class="flex flex-col gap-3">
+                            <a href="#"
+                                class="hover:text-surface transition-colors cursor-pointer w-full md:w-fit md:ml-auto">Tentang
+                                Kami</a>
+                            <a href="#"
+                                class="hover:text-surface transition-colors cursor-pointer w-full md:w-fit md:ml-auto">Artikel</a>
+                            <a href="#"
+                                class="hover:text-surface transition-colors cursor-pointer w-full md:w-fit md:ml-auto">Donasi</a>
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <a href="#"
+                                class="hover:text-surface transition-colors cursor-pointer w-full md:w-fit md:ml-auto">Al-Quran</a>
+                            <a href="#"
+                                class="hover:text-surface transition-colors cursor-pointer w-full md:w-fit md:ml-auto">Dzikir</a>
+                            <a href="#"
+                                class="hover:text-surface transition-colors cursor-pointer w-full md:w-fit md:ml-auto">Acara</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div
+                class="w-full max-w-[1400px] flex flex-col md:flex-row items-center justify-between gap-6 pt-6 md:pt-8 border-t border-surface/10 relative z-10 text-[9px] sm:text-[10px] md:text-xs font-sans text-surface/50 tracking-wide">
+
+                <div class="flex items-center gap-3 md:gap-4 order-2 md:order-1">
+                    <div class="flex items-center gap-2 bg-accent text-primary px-2 md:px-2.5 py-1 rounded font-bold">
+                        <span class="w-1.5 h-1.5 rounded-full bg-primary/40 animate-pulse"></span>
+                        1447 Hijriah
+                    </div>
+                    <span class="">Edisi Spesial Ramadan</span>
+                </div>
+
+                <div
+                    class="flex flex-wrap justify-center items-center gap-4 md:gap-6 bg-primary/50 backdrop-blur-sm border border-surface/10 px-4 md:px-6 py-2 rounded-full order-1 md:order-2">
+                    <a href="#" class="hover:text-surface transition-colors">Kebijakan Privasi</a>
+                    <a href="#" class="hover:text-surface transition-colors">Syarat & Ketentuan</a>
+                    <span>&copy;2026</span>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+    <script src="../public/assets/js/menu.js"></script>
+    <script src="../public/assets/js/imsakiyah.js"></script>
+</body>
+
+</html>

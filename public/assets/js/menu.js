@@ -44,6 +44,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </a>
 
+                <a href="${isInPages ? 'imsakiyah.html' : 'pages/imsakiyah.html'}" class="menu-item group font-bold font-sans text-background text-2xl md:text-3xl lg:text-4xl transition-all duration-700 translate-y-16 opacity-0 flex perspective-[1000px]">
+                    <span class="sr-only">Jadwal Imsakiyah</span>
+                    <div class="flex overflow-hidden relative" aria-hidden="true">
+                        ${'Jadwal Imsakiyah'.split('').map((char, index) => `<span class="inline-block transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] transform group-hover:-translate-y-full" style="transition-delay: ${index * 20}ms">${char === ' ' ? '&nbsp;' : char}</span>`).join('')}
+                        <div class="absolute inset-0 flex text-accent">
+                            ${'Jadwal Imsakiyah'.split('').map((char, index) => `<span class="inline-block transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] transform translate-y-full group-hover:translate-y-0" style="transition-delay: ${index * 20}ms">${char === ' ' ? '&nbsp;' : char}</span>`).join('')}
+                        </div>
+                    </div>
+                </a>
+
                 <a href="${isInPages ? 'todolist.html' : 'pages/todolist.html'}" class="menu-item group font-bold font-sans text-background text-2xl md:text-3xl lg:text-4xl transition-all duration-700 translate-y-16 opacity-0 flex perspective-[1000px]">
                     <span class="sr-only">Kitab Amal</span>
                     <div class="flex overflow-hidden relative" aria-hidden="true">
