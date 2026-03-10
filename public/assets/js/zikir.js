@@ -5,15 +5,16 @@ const targetDisplay = document.getElementById('target-display');
 const touchArea = document.getElementById('touch-area');
 const particleContainer = document.getElementById('particle-container');
 const phraseDisplay = document.getElementById('phrase-display');
+const latinDisplay = document.getElementById('latin-phrase');
 const parallaxText = document.getElementById('parallax-text');
 const ambientGlow = document.getElementById('ambient-glow');
 const celebScreen = document.getElementById('celebration-screen');
 const resetModal = document.getElementById('reset-modal');
 
 const phrases = [
-    { text: "سُبْحَانَ ٱللَّٰهِ", glow: "bg-accent/10", bg: "bg-primary" },
-    { text: "ٱلْحَمْدُ لِلَّٰهِ", glow: "bg-blue-500/10", bg: "bg-slate-900" },
-    { text: "ٱللَّٰهُ أَكْبَرُ", glow: "bg-teal-500/10", bg: "bg-teal-950" }
+    { text: "سُبْحَانَ ٱللَّٰهِ", latin: "SubhanAllah", glow: "bg-accent/10", bg: "bg-primary" },
+    { text: "ٱلْحَمْدُ لِلَّٰهِ", latin: "Alhamdulillah", glow: "bg-blue-500/10", bg: "bg-slate-900" },
+    { text: "ٱللَّٰهُ أَكْبَرُ", latin: "Allahu Akbar", glow: "bg-teal-500/10", bg: "bg-teal-950" }
 ];
 
 // Audio State and Setup
@@ -65,16 +66,22 @@ function updateTheme(phaseIndex) {
     if (!phraseDisplay || !parallaxText || !ambientGlow) return;
 
     phraseDisplay.classList.add('opacity-0', '-translate-y-4');
+    if (latinDisplay) latinDisplay.classList.add('opacity-0', '-translate-y-4');
 
     const parallaxSpan = parallaxText.querySelector('span');
     if (parallaxSpan) parallaxSpan.classList.add('opacity-0');
 
     setTimeout(() => {
         phraseDisplay.innerText = phase.text;
+        if (latinDisplay) latinDisplay.innerText = phase.latin;
         if (parallaxSpan) parallaxSpan.innerText = phase.text;
 
         phraseDisplay.classList.remove('-translate-y-4');
         phraseDisplay.classList.add('translate-y-4');
+        if (latinDisplay) {
+            latinDisplay.classList.remove('-translate-y-4');
+            latinDisplay.classList.add('translate-y-4');
+        }
 
         ambientGlow.className = `fixed top-1/2 left-0 -translate-y-1/2 w-[80vw] h-[80vw] md:w-[60vw] md:h-[60vw] rounded-full blur-[120px] pointer-events-none transition-colors duration-1000 z-0 ${phase.glow}`;
 
@@ -85,6 +92,7 @@ function updateTheme(phaseIndex) {
 
         setTimeout(() => {
             phraseDisplay.classList.remove('opacity-0', 'translate-y-4');
+            if (latinDisplay) latinDisplay.classList.remove('opacity-0', 'translate-y-4');
             if (parallaxSpan) parallaxSpan.classList.remove('opacity-0');
         }, 50);
     }, 500);
@@ -114,6 +122,8 @@ function applyTarget(newTarget) {
     let activeId = target === 33 ? 'btn-33' : (target === 100 ? 'btn-100' : 'btn-inf');
     const activeBtn = document.getElementById(activeId);
     if (activeBtn) activeBtn.classList.add('target-active');
+    
+    saveZikirState();
 }
 
 function spawnRipple(x, y) {
@@ -164,6 +174,7 @@ function processZikir(clientX, clientY) {
 
     count++;
     playTapSound();
+    saveZikirState();
 
     if (display) {
         display.innerText = count;
@@ -182,9 +193,11 @@ function processZikir(clientX, clientY) {
         updateTheme(phaseIndex);
 
         if (target !== Infinity && count === target) {
+            logZikirSession();
             celebration();
         }
     } else if (target !== Infinity && count === target) {
+        logZikirSession();
         celebration();
     }
 }
@@ -248,6 +261,10 @@ function confirmReset() {
 }
 
 function performReset() {
+    if (count > 0 && target === Infinity) {
+        logZikirSession();
+    }
+    
     count = 0;
     if (display) display.innerText = count;
     updateTheme(0);
@@ -255,6 +272,68 @@ function performReset() {
     if (display) display.classList.remove('anim-calm');
 
     if (navigator.vibrate) navigator.vibrate(50);
+    saveZikirState();
 }
 
-updateTheme(0);
+// ============================================
+// PERSISTENCE & LOGGING
+// ============================================
+
+function saveZikirState() {
+    localStorage.setItem('zikir_count', count);
+    localStorage.setItem('zikir_target', target === Infinity ? '999999' : target);
+}
+
+function loadZikirState() {
+    const savedCount = localStorage.getItem('zikir_count');
+    const savedTarget = localStorage.getItem('zikir_target');
+
+    if (savedCount !== null) {
+        count = parseInt(savedCount);
+        if (display) display.innerText = count;
+    }
+
+    if (savedTarget !== null) {
+        const t = parseInt(savedTarget);
+        applyTarget(t >= 999999 ? Infinity : t);
+    }
+
+    // Restore phase theme
+    if (count > 0) {
+        const phaseIndex = Math.floor(count / 33);
+        updateTheme(phaseIndex);
+    }
+}
+
+function logZikirSession() {
+    if (count === 0) return;
+
+    const historyKey = 'noor_ramadhan_zikir_history';
+    let history = [];
+    try {
+        const saved = localStorage.getItem(historyKey);
+        if (saved) history = JSON.parse(saved);
+    } catch (e) { }
+
+    const phaseIndex = Math.floor((count - 1) / 33);
+    const phrase = phrases[phaseIndex % phrases.length];
+
+    const session = {
+        count: count,
+        phrase: phrase.latin,
+        arabic: phrase.text,
+        timestamp: new Date().toISOString()
+    };
+
+    history.unshift(session);
+    // Keep last 20 sessions
+    if (history.length > 20) history = history.slice(0, 20);
+
+    localStorage.setItem(historyKey, JSON.stringify(history));
+}
+
+// ============================================
+// STARTUP
+// ============================================
+loadZikirState();
+if (count === 0) updateTheme(0);

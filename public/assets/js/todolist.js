@@ -26,7 +26,14 @@ document.addEventListener('DOMContentLoaded', function () {
     renderShalatState();
     renderQuranState();
     renderPuasaState();
+    renderZikirHistory();
     updateAllOrbits();
+
+    // Deep linking support
+    const hash = window.location.hash.substring(1);
+    if (hash && ['shalat', 'quran', 'puasa', 'dzikir'].includes(hash)) {
+        switchTab(hash);
+    }
 
     // Trigger tab content active animation
     setTimeout(function () {
@@ -391,14 +398,15 @@ function updateAllOrbits() {
     setOrbit('orbit-puasa', puasaPct);
     document.getElementById('orbit-puasa-pct').textContent = Math.round(puasaPct) + '%';
 
-    // Dzikir orbit (from zikir counter localStorage)
+    // Dzikir orbit (unified with zikir_history)
     let dzikirPct = 0;
     try {
-        const zikirData = localStorage.getItem('zikir_count');
-        const zikirTarget = localStorage.getItem('zikir_target');
-        if (zikirData && zikirTarget) {
-            dzikirPct = Math.min(100, (parseInt(zikirData) / parseInt(zikirTarget)) * 100);
-        }
+        const history = JSON.parse(localStorage.getItem('noor_ramadhan_zikir_history') || '[]');
+        const currentSessionCount = parseInt(localStorage.getItem('zikir_count') || '0');
+        const currentSessionTarget = parseInt(localStorage.getItem('zikir_target') || '33');
+        
+        // Use current session progress for the orbit
+        dzikirPct = Math.min(100, (currentSessionCount / currentSessionTarget) * 100);
     } catch (e) { }
     setOrbit('orbit-dzikir', dzikirPct);
     document.getElementById('orbit-dzikir-pct').textContent = Math.round(dzikirPct) + '%';
@@ -496,4 +504,73 @@ function showToast(message) {
         toast.style.transform = 'translate(-50%, 10px)';
         toast.style.pointerEvents = 'none';
     }, 2500);
+}
+
+// ============================================
+// DZIKIR HISTORY
+// ============================================
+function renderZikirHistory() {
+    const listEl = document.getElementById('zikir-history-list');
+    const emptyEl = document.getElementById('zikir-empty-state');
+    const totalEl = document.getElementById('zikir-today-total');
+    const targetEl = document.getElementById('zikir-today-target');
+
+    if (!listEl) return;
+
+    try {
+        const history = JSON.parse(localStorage.getItem('noor_ramadhan_zikir_history') || '[]');
+        const currentCount = parseInt(localStorage.getItem('zikir_count') || '0');
+        const currentTarget = parseInt(localStorage.getItem('zikir_target') || '33');
+
+        // Update Summaries
+        let totalCount = currentCount;
+        history.forEach(session => {
+            // Only count today's sessions
+            const sessionDate = new Date(session.timestamp).toDateString();
+            if (sessionDate === new Date().toDateString()) {
+                totalCount += session.count;
+            }
+        });
+
+        if (totalEl) totalEl.textContent = totalCount;
+        if (targetEl) targetEl.textContent = currentTarget === 999999 ? '∞' : currentTarget;
+
+        // Render List
+        if (history.length === 0) {
+            if (emptyEl) emptyEl.classList.remove('hidden');
+            return;
+        }
+
+        if (emptyEl) emptyEl.classList.add('hidden');
+        
+        // Clear previous list but keep empty state hidden
+        const items = listEl.querySelectorAll('.zikir-history-item');
+        items.forEach(item => item.remove());
+
+        history.forEach(session => {
+            const date = new Date(session.timestamp);
+            const timeStr = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            
+            const item = document.createElement('div');
+            item.className = 'zikir-history-item p-4 rounded-2xl bg-white/40 border border-primary/5 flex items-center justify-between group hover:border-accent/30 transition-all duration-300';
+            item.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center border border-accent/20">
+                        <span class="material-symbols-outlined text-accent text-lg">check</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-sans text-xs font-bold text-primary italic uppercase tracking-wider">${session.phrase}</span>
+                        <span class="font-sans text-[10px] text-primary/40">${timeStr} • ${session.arabic}</span>
+                    </div>
+                </div>
+                <div class="flex flex-col items-end">
+                    <span class="font-serif text-lg font-bold text-primary">${session.count}</span>
+                    <span class="font-sans text-[8px] uppercase tracking-widest text-primary/30 font-bold">Kali</span>
+                </div>
+            `;
+            listEl.appendChild(item);
+        });
+    } catch (e) {
+        console.warn('Failed to render zikir history:', e);
+    }
 }

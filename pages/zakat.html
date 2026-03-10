@@ -407,9 +407,7 @@
         </div>
     </main>
 
-    <footer class="relative z-10 w-full pb-8 text-center pointer-events-none mt-12">
-        <p class="font-sans text-[10px] text-primary tracking-widest uppercase font-semibold">&copy; 1447H Noor Ramadhan. Harta suci, jiwa tenang.</p>
-    </footer>
+
 
     <!-- Floating Toast Notification -->
     <div id="toast-error" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] bg-[#9E4A4A] text-white/95 px-6 py-4 rounded-2xl shadow-[0_20px_50px_rgba(158,74,74,0.3)] border border-white/10 flex items-center gap-4 opacity-0 translate-y-10 pointer-events-none transition-all duration-500 w-[calc(100%-3rem)] md:w-max">
@@ -574,6 +572,200 @@
         animate();
     })();
     </script>
-</body>
+        <footer class="w-full relative mt-32 pb-0">
+            <!-- Moon -->
+            <div
+                class="absolute -top-[3rem] md:-top-[4rem] left-1/2 -translate-x-1/2 z-30 drop-shadow-xl pointer-events-none mb-6 md:mb-10"
+            >
+                <img
+                    src="../public/assets/images/moonelement.png"
+                    alt="Moon Element"
+                    class="w-20 md:w-28 h-20 md:h-28 object-contain transition-transform duration-1000 hover:scale-105"
+                    style="
+                        animation: float 8s ease-in-out infinite;
+                        will-change: transform;
+                    "
+                />
+            </div>
+
+            <div
+                class="w-full bg-primary rounded-t-[2rem] relative overflow-hidden flex flex-col items-center pt-20 md:pt-28 pb-8 md:pb-10 px-6 md:px-8 lg:px-20 z-10"
+            >
+                <div
+                    class="absolute inset-0 opacity-10 pointer-events-none"
+                    style="
+                        background-image: url('data:image/svg+xml,%3Csvg width=\'100%25\' height=\'100%25\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cdefs%3E%3Cpattern id=\'topography\' width=\'200\' height=\'200\' patternUnits=\'userSpaceOnUse\'%3E%3Cpath d=\'M0 100 Q 50 20 100 100 T 200 100\' fill=\'none\' stroke=\'%23D4AF37\' stroke-width=\'1\' opacity=\'0.8\'/%3E%3Cpath d=\'M0 120 Q 50 40 100 120 T 200 120\' fill=\'none\' stroke=\'%23D4AF37\' stroke-width=\'1\' opacity=\'0.6\'/%3E%3Cpath d=\'M0 140 Q 50 60 100 140 T 200 140\' fill=\'none\' stroke=\'%23D4AF37\' stroke-width=\'1\' opacity=\'0.4\'/%3E%3Cpath d=\'M0 160 Q 50 80 100 160 T 200 160\' fill=\'none\' stroke=\'%23D4AF37\' stroke-width=\'1\' opacity=\'0.2\'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width=\'100%25\' height=\'100%25\' fill=\'url(%23topography)\' /%3E%3C/svg%3E');
+                        background-size: cover;
+                        background-position: center;
+                    "
+                ></div>
+
+                <div
+                    class="absolute top-[20%] left-1/2 -translate-x-1/2 w-[80vw] md:w-[60vw] h-[80vw] md:h-[60vw] max-w-[500px] max-h-[500px] bg-accent/10 blur-[80px] md:blur-[120px] rounded-full"
+                ></div>
+
+                <div
+                    class="w-full max-w-[1400px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 md:gap-16 lg:gap-8 relative z-10 mb-12 md:mb-20"
+                >
+                    <!-- Hubungi Kami -->
+                    <div
+                        class="flex flex-col items-center md:items-start text-center md:text-left order-2 md:order-1"
+                    >
+                        <h3
+                            class="font-sans font-medium text-surface text-base md:text-lg mb-4 md:mb-6 tracking-wide"
+                        >
+                            Hubungi Kami
+                        </h3>
+                        <div
+                            class="font-sans text-surface/60 font-light text-xs md:text-sm leading-relaxed mb-6 md:mb-8"
+                        >
+                            <p>Masjid Raya Pusat</p>
+                            <p>Jl. Kebajikan No. 1447</p>
+                            <p>021 - 8899 7766</p>
+                            <a
+                                href="mailto:salam@royalramadan.com"
+                                class="hover:text-accent transition-colors border-b border-transparent hover:border-accent inline-block mt-2"
+                                >salam@royalramadan.com</a
+                            >
+                        </div>
+
+                        <div class="flex items-center gap-4 text-surface/80 mt-2">
+                            <a
+                                href="#"
+                                class="w-10 h-10 flex items-center justify-center border border-surface/20 rounded-full hover:border-accent hover:text-accent hover:-translate-y-1 transition-all duration-300"
+                                aria-label="Instagram"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                                    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+                                </svg>
+                            </a>
+                            <a
+                                href="#"
+                                class="w-10 h-10 flex items-center justify-center border border-surface/20 rounded-full hover:border-accent hover:text-accent hover:-translate-y-1 transition-all duration-300"
+                                aria-label="YouTube"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path
+                                        d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"
+                                    />
+                                    <path d="M10 15V9l5 3-5 3z" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Logo -->
+                    <div
+                        class="flex flex-col items-center justify-center text-center mt-6 md:mt-0 order-1 lg:order-2"
+                    >
+                        <h3
+                            class="font-display text-5xl sm:text-6xl md:text-8xl lg:text-[5.5rem] text-surface mb-2 leading-none tracking-normal drop-shadow-sm"
+                        >
+                            Noor Ramadhan
+                        </h3>
+                    </div>
+
+                    <!-- Akses Cepat -->
+                    <div
+                        class="flex flex-col items-center md:items-end text-center md:text-right order-3 lg:order-3"
+                    >
+                        <h3
+                            class="font-sans font-medium text-surface text-base md:text-lg mb-4 md:mb-6 tracking-wide"
+                        >
+                            Akses Cepat
+                        </h3>
+                        <div
+                            class="grid grid-cols-2 gap-x-8 md:gap-x-12 gap-y-3 font-sans text-surface/60 font-light text-xs md:text-sm w-full md:w-auto text-center md:text-right"
+                        >
+                            <div class="flex flex-col gap-3">
+                                <a
+                                    href="../index.html"
+                                    class="hover:text-surface transition-colors cursor-pointer w-full md:w-fit md:ml-auto"
+                                    >Jadwal Shalat</a
+                                >
+                                <a
+                                    href="imsakiyah.html"
+                                    class="hover:text-surface transition-colors cursor-pointer w-full md:w-fit md:ml-auto"
+                                    >Imsakiyah</a
+                                >
+                                <a
+                                    href="todolist.html"
+                                    class="hover:text-surface transition-colors cursor-pointer w-full md:w-fit md:ml-auto"
+                                    >Kitab Amal</a
+                                >
+                            </div>
+                            <div class="flex flex-col gap-3">
+                                <a
+                                    href="zikir.html"
+                                    class="hover:text-surface transition-colors cursor-pointer w-full md:w-fit md:ml-auto"
+                                    >Zikir Counter</a
+                                >
+                                <a
+                                    href="zakat.html"
+                                    class="hover:text-surface transition-colors cursor-pointer w-full md:w-fit md:ml-auto"
+                                    >Kalkulator Zakat</a
+                                >
+                                <a
+                                    href="todolist.html#quran"
+                                    class="hover:text-surface transition-colors cursor-pointer w-full md:w-fit md:ml-auto"
+                                    >Al-Quran</a
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="w-full max-w-[1400px] flex flex-col md:flex-row items-center justify-between gap-6 pt-6 md:pt-8 border-t border-surface/10 relative z-10 text-[9px] sm:text-[10px] md:text-xs font-sans text-surface/50 tracking-wide"
+                >
+                    <div class="flex items-center gap-3 md:gap-4 order-2 md:order-1">
+                        <div
+                            class="flex items-center gap-2 bg-accent text-primary px-2 md:px-2.5 py-1 rounded font-bold"
+                        >
+                            <span
+                                class="w-1.5 h-1.5 rounded-full bg-primary/40 animate-pulse"
+                            ></span>
+                            1447 Hijriah
+                        </div>
+                        <span class="">Edisi Spesial Ramadan</span>
+                    </div>
+
+                    <div
+                        class="flex flex-wrap justify-center items-center gap-4 md:gap-6 bg-primary/50 backdrop-blur-sm border border-surface/10 px-4 md:px-6 py-2 rounded-full order-1 md:order-2"
+                    >
+                        <a href="#" class="hover:text-surface transition-colors"
+                            >Kebijakan Privasi</a
+                        >
+                        <a href="#" class="hover:text-surface transition-colors"
+                            >Syarat & Ketentuan</a
+                        >
+                        <span>&copy;2026</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </body>
 
 </html>                                                 

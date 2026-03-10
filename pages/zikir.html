@@ -258,9 +258,14 @@
     <main class="relative z-20 h-full w-full flex flex-col justify-center pl-[8%] md:pl-[15%] pointer-events-none">
         <section aria-label="Zikir Counter"
             class="flex flex-col items-start relative w-full pr-20 md:pr-0 md:max-w-[70vw]">
-            <p id="phrase-display"
-                class="font-arabic text-4xl md:text-5xl lg:text-5xl text-accent mb-8 drop-shadow-md transition-all duration-700 animate-fade-up opacity-0 delay-100">
-                سُبْحَانَ ٱللَّٰهِ</p>
+            <div class="flex flex-row items-baseline gap-4 md:gap-6 mb-8 animate-fade-up opacity-0 delay-100">
+                <p id="phrase-display"
+                    class="font-arabic text-4xl md:text-5xl lg:text-5xl text-accent drop-shadow-md">
+                    سُبْحَانَ ٱللَّٰهِ</p>
+                <p id="latin-phrase"
+                    class="font-serif text-xs md:text-sm text-surface/30 italic uppercase tracking-[0.2em] font-bold transition-all duration-700">
+                    SubhanAllah</p>
+            </div>
 
             <div class="relative animate-fade-up opacity-0 delay-300">
                 <h1 id="count-display"
@@ -347,6 +352,15 @@
                     refresh
                 </span>
             </button>
+
+            <!-- History Button -->
+            <a href="todolist.html#dzikir" onclick="event.stopPropagation();"
+                class="w-12 h-12 rounded-full flex items-center justify-center group border border-surface/20 text-surface/50 hover:text-accent hover:border-accent transition-all duration-500"
+                title="Riwayat Zikir">
+                <span class="material-symbols-outlined transform transition-transform duration-500 text-xl">
+                    history
+                </span>
+            </a>
 
             <!-- Home Button -->
             <a href="../index.html" onclick="event.stopPropagation();"
