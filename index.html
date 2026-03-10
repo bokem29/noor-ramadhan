@@ -8,6 +8,10 @@
     <link rel="shortcut icon" href="public/assets/images/logo.png" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="preload" href="public/assets/fonts/AwalRamadhan-eZ2WB.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="public/assets/fonts/Sora-Regular.ttf" as="font" type="font/ttf" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap"
         rel="stylesheet">
 
@@ -151,7 +155,7 @@
 
                     <div
                         class="absolute bottom-0 right-0 w-full h-full pointer-events-none overflow-hidden opacity-20 transition-opacity duration-500 group-hover/card:opacity-30">
-                        <img src="./public/assets/images/kurma.png" alt="Kurma"
+                        <img src="./public/assets/images/kurma.png" alt="Kurma" loading="lazy" width="450" height="450"
                             class="absolute bottom-[-120px] right-[-120px] w-[450px] h-[450px] object-contain transition-transform duration-500 group-hover/card:scale-105 drop-shadow-[0_0_30px_rgba(245,158,11,0.3)]">
                     </div>
 
@@ -205,7 +209,7 @@
 
         <!-- Moon -->
         <div class="absolute -top-[4rem] left-1/2 -translate-x-1/2 z-30 drop-shadow-xl pointer-events-none mb-10">
-            <img src="./public/assets/images/moonelement.png" alt="Moon Element"
+            <img src="./public/assets/images/moonelement.png" alt="Moon Element" width="112" height="112"
                 class="w-28 h-28 object-contain transition-transform duration-1000 hover:scale-105"
                 style="animation: float 8s ease-in-out infinite; will-change: transform;">
         </div>
@@ -318,5 +322,5 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="./public/assets/js/menu.js"></script>
+    <script src="./public/assets/js/menu.js" defer></script>
 </body>

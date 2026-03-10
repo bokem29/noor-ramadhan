@@ -56,14 +56,18 @@ async function initDropdown() {
     });
 
     // Search Filtering
+    // Search Filtering (Debounced)
+    let searchTimeout;
     searchInput?.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase();
-        filterCities(query);
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            filterCities(query);
+        }, 200);
     });
 }
 
 async function fetchAllCities() {
-    const cityList = document.getElementById('city-list');
     const loading = document.getElementById('city-list-loading');
     
     try {
@@ -72,25 +76,30 @@ async function fetchAllCities() {
         
         if (data.status && data.data) {
             ALL_CITIES = data.data;
-            loading.classList.add('hidden');
+            loading?.classList.add('hidden');
             renderCityList(ALL_CITIES);
         }
     } catch (err) {
         console.error('Failed to fetch cities:', err);
-        loading.innerHTML = '<span class="text-red-400 text-[10px] font-bold uppercase">Gagal memuat kota</span>';
+        if (loading) loading.innerHTML = '<span class="text-red-400 text-[10px] font-bold uppercase">Gagal memuat kota</span>';
     }
 }
 
 function renderCityList(cities) {
     const cityList = document.getElementById('city-list');
-    const cityItems = cityList.querySelectorAll('.custom-dropdown-item');
-    cityItems.forEach(item => item.remove());
+    if (!cityList) return;
+    
+    // Clear existing list efficiently
+    cityList.innerHTML = '';
+    
+    const fragment = document.createDocumentFragment();
 
     cities.forEach(city => {
         const isSelected = city.id === ACTIVE_CITY_ID;
         const item = document.createElement('div');
         item.className = `custom-dropdown-item px-5 py-4 cursor-pointer transition-all duration-300 flex items-center gap-3 group/item relative overflow-hidden group hover:pl-7 ${isSelected ? 'text-accent font-bold active-city' : 'text-primary/50'}`;
         item.dataset.id = city.id;
+        item.dataset.lokasi = city.lokasi.toLowerCase();
         
         item.innerHTML = `
             <div class="absolute left-0 top-0 bottom-0 w-1 bg-accent ${isSelected ? 'opacity-100' : 'opacity-0'} group-hover/item:opacity-100 transition-opacity duration-300"></div>
@@ -102,21 +111,33 @@ function renderCityList(cities) {
             selectCity(city.id, city.lokasi);
         });
 
-        cityList.appendChild(item);
+        fragment.appendChild(item);
     });
+    
+    cityList.appendChild(fragment);
 }
 
 function filterCities(query) {
-    const filtered = ALL_CITIES.filter(city => city.lokasi.toLowerCase().includes(query));
+    const cityItems = document.querySelectorAll('.custom-dropdown-item');
     const emptyState = document.getElementById('city-list-empty');
+    let hasResults = false;
     
-    if (filtered.length === 0) {
-        emptyState.classList.remove('hidden');
+    // Use CSS classes to hide/show for better performance than re-rendering
+    cityItems.forEach(item => {
+        const isMatch = item.dataset.lokasi.includes(query);
+        if (isMatch) {
+            item.classList.remove('hidden');
+            hasResults = true;
+        } else {
+            item.classList.add('hidden');
+        }
+    });
+    
+    if (hasResults) {
+        emptyState?.classList.add('hidden');
     } else {
-        emptyState.classList.add('hidden');
+        emptyState?.classList.remove('hidden');
     }
-    
-    renderCityList(filtered);
 }
 
 function selectCity(id, name) {
@@ -133,7 +154,7 @@ function selectCity(id, name) {
 
     const menu = document.getElementById('city-dropdown-menu');
     const arrow = document.getElementById('city-dropdown-arrow');
-    menu.classList.remove('active');
+    menu?.classList.remove('active');
     arrow?.classList.remove('-rotate-180');
 
     // Fetch new data
@@ -142,9 +163,9 @@ function selectCity(id, name) {
 
 function initImsakiyah() {
     // Initial fetch using persisted OR default city
-    setTimeout(() => {
+    requestAnimationFrame(() => {
         fetchJadwal(ACTIVE_CITY_ID);
-    }, 500);
+    });
 }
 
 async function fetchJadwal(cityId) {
@@ -154,23 +175,26 @@ async function fetchJadwal(cityId) {
     const tableSection = document.getElementById('table-section');
     const tbody = document.getElementById('imsakiyah-tbody');
 
+    if (!mainContent || !loader || !tbody) return;
+
     // Show loading state
     loader.classList.add('active');
     mainContent.style.opacity = '0';
     mainContent.style.transform = 'translateY(10px)';
-    errorState.classList.remove('active');
+    errorState?.classList.remove('active');
 
     try {
         const response = await fetch(`https://api.myquran.com/v2/sholat/jadwal/${cityId}/${YEAR}/${MONTH}`);
         const result = await response.json();
 
         if (result.status && result.data && result.data.jadwal) {
+            // Reduced artificial delay for snappier feel
             setTimeout(() => {
                 tbody.innerHTML = '';
                 renderTable(result.data.jadwal);
                 
                 loader.classList.remove('active');
-                tableSection.style.display = 'block';
+                if (tableSection) tableSection.style.display = 'block';
 
                 requestAnimationFrame(() => {
                     mainContent.style.opacity = '1';
@@ -178,15 +202,15 @@ async function fetchJadwal(cityId) {
                 });
                 
                 scrollToToday();
-            }, 800);
+            }, 300);
         } else {
             throw new Error('Invalid data');
         }
     } catch (error) {
         console.error('Fetch error:', error);
         loader.classList.remove('active');
-        tableSection.style.display = 'none';
-        errorState.classList.add('active');
+        if (tableSection) tableSection.style.display = 'none';
+        errorState?.classList.add('active');
         
         requestAnimationFrame(() => {
             mainContent.style.opacity = '1';
@@ -198,9 +222,8 @@ async function fetchJadwal(cityId) {
 function renderTable(jadwal) {
     const tbody = document.getElementById('imsakiyah-tbody');
     const todayStr = getTodayISO();
-    
-    // Determine Timezone based on the currently active city name
     const currentTz = getTimezoneHelper(ACTIVE_CITY_NAME);
+    const fragment = document.createDocumentFragment();
 
     const icons = {
         imsak: 'bedtime',
@@ -215,7 +238,7 @@ function renderTable(jadwal) {
         const isToday = day.date === todayStr;
         const tr = document.createElement('tr');
         tr.className = `stagger-row table-slab group ${isToday ? 'today' : ''}`;
-        tr.style.animationDelay = `${index * 0.05}s`;
+        tr.style.animationDelay = `${index * 0.03}s`; // Faster stagger
 
         const timeCell = (key, time) => `
             <td class="p-6 transition-all duration-500 ${isToday ? '' : 'group-hover:bg-accent/5'}">
@@ -246,8 +269,9 @@ function renderTable(jadwal) {
             ${timeCell('maghrib', day.maghrib)}
             ${timeCell('isya', day.isya)}
         `;
-        tbody.appendChild(tr);
+        fragment.appendChild(tr);
     });
+    tbody?.appendChild(fragment);
 }
 
 function scrollToToday() {

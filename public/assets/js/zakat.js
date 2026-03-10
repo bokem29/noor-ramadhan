@@ -185,17 +185,22 @@ let currentNisabMemory = 0;
 let currentRiceMemory = 0;
 
 function calculateZakat() {
-    const hargaEmas = parseNumber(inputHargaEmas.value);
+    const hargaEmasVal = inputHargaEmas.value;
+    const gajiVal = inputGaji.value;
+    const tambahanVal = inputTambahan.value;
+    const gramEmasVal = inputGramEmas.value;
+    
+    const hargaEmas = parseNumber(hargaEmasVal);
 
     // Validation
     let emptyFields = [];
-    if (parseNumber(inputHargaEmas.value) === 0) emptyFields.push(inputHargaEmas);
+    if (hargaEmas === 0) emptyFields.push(inputHargaEmas);
     if (currentType === 'penghasilan') {
-        if (parseNumber(inputGaji.value) === 0 && parseNumber(inputTambahan.value) === 0) {
+        if (parseNumber(gajiVal) === 0 && parseNumber(tambahanVal) === 0) {
             emptyFields.push(inputGaji, inputTambahan);
         }
     } else {
-        if (parseNumber(inputGramEmas.value) === 0) emptyFields.push(inputGramEmas);
+        if (parseNumber(gramEmasVal) === 0) emptyFields.push(inputGramEmas);
     }
 
     if (emptyFields.length > 0) {

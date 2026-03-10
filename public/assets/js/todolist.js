@@ -16,6 +16,11 @@ let state = {
     dzikir: 0
 };
 
+// Cached storage to prevent repeated Disk I/O during orbit updates
+let CACHED_ZIKIR_HISTORY = null;
+let CACHED_ZIKIR_COUNT = 0;
+let CACHED_ZIKIR_TARGET = 33;
+
 // ============================================
 // INIT
 // ============================================
@@ -26,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
     renderShalatState();
     renderQuranState();
     renderPuasaState();
+    syncZikirCache();
     renderZikirHistory();
     updateAllOrbits();
 
@@ -400,14 +406,14 @@ function updateAllOrbits() {
 
     // Dzikir orbit (unified with zikir_history)
     let dzikirPct = 0;
-    try {
-        const history = JSON.parse(localStorage.getItem('noor_ramadhan_zikir_history') || '[]');
-        const currentSessionCount = parseInt(localStorage.getItem('zikir_count') || '0');
-        const currentSessionTarget = parseInt(localStorage.getItem('zikir_target') || '33');
-        
-        // Use current session progress for the orbit
-        dzikirPct = Math.min(100, (currentSessionCount / currentSessionTarget) * 100);
-    } catch (e) { }
+    
+    // Use cached values instead of multiple localStorage reads per frame
+    const currentSessionCount = CACHED_ZIKIR_COUNT;
+    const currentSessionTarget = CACHED_ZIKIR_TARGET;
+    
+    // Use current session progress for the orbit
+    dzikirPct = Math.min(100, (currentSessionCount / currentSessionTarget) * 100);
+    
     setOrbit('orbit-dzikir', dzikirPct);
     document.getElementById('orbit-dzikir-pct').textContent = Math.round(dzikirPct) + '%';
 
@@ -509,6 +515,16 @@ function showToast(message) {
 // ============================================
 // DZIKIR HISTORY
 // ============================================
+function syncZikirCache() {
+    try {
+        CACHED_ZIKIR_HISTORY = JSON.parse(localStorage.getItem('noor_ramadhan_zikir_history') || '[]');
+        CACHED_ZIKIR_COUNT = parseInt(localStorage.getItem('zikir_count') || '0');
+        CACHED_ZIKIR_TARGET = parseInt(localStorage.getItem('zikir_target') || '33');
+    } catch (e) {
+        CACHED_ZIKIR_HISTORY = [];
+    }
+}
+
 function renderZikirHistory() {
     const listEl = document.getElementById('zikir-history-list');
     const emptyEl = document.getElementById('zikir-empty-state');
@@ -517,17 +533,20 @@ function renderZikirHistory() {
 
     if (!listEl) return;
 
-    try {
-        const history = JSON.parse(localStorage.getItem('noor_ramadhan_zikir_history') || '[]');
-        const currentCount = parseInt(localStorage.getItem('zikir_count') || '0');
-        const currentTarget = parseInt(localStorage.getItem('zikir_target') || '33');
+    // Refresh cache before rendering if it's the first time
+    if (CACHED_ZIKIR_HISTORY === null) syncZikirCache();
 
+    try {
+        const history = CACHED_ZIKIR_HISTORY;
+        const currentCount = CACHED_ZIKIR_COUNT;
+        const currentTarget = CACHED_ZIKIR_TARGET;
+        
         // Update Summaries
         let totalCount = currentCount;
+        const todayStr = new Date().toDateString();
+        
         history.forEach(session => {
-            // Only count today's sessions
-            const sessionDate = new Date(session.timestamp).toDateString();
-            if (sessionDate === new Date().toDateString()) {
+            if (new Date(session.timestamp).toDateString() === todayStr) {
                 totalCount += session.count;
             }
         });

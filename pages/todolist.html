@@ -13,6 +13,11 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        <link rel="preload" href="../public/assets/fonts/Sora-Regular.ttf" as="font" type="font/ttf" crossorigin>
+        <link rel="preload" href="../public/assets/fonts/PlayfairDisplay-Regular.ttf" as="font" type="font/ttf" crossorigin>
+        <link rel="preload" href="../public/assets/fonts/AwalRamadhan-eZ2WB.ttf" as="font" type="font/ttf" crossorigin>
         <link
             href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Sora:wght@300;400;500;600;700&display=swap"
             rel="stylesheet"
@@ -365,6 +370,8 @@
                 <img
                     src="../public/assets/images/logo3.png"
                     alt="Noor Ramadhan"
+                    width="24"
+                    height="24"
                     class="h-6 w-6 object-contain"
                 />
                 <span
@@ -1431,6 +1438,8 @@
                 <img
                     src="../public/assets/images/moonelement.png"
                     alt="Moon Element"
+                    width="112"
+                    height="112"
                     class="w-20 md:w-28 h-20 md:h-28 object-contain transition-transform duration-1000 hover:scale-105"
                     style="
                         animation: float 8s ease-in-out infinite;
@@ -1636,7 +1645,8 @@
         </div>
 
         <!-- Scripts -->
-        <script src="../public/assets/js/todolist.js"></script>
+        <script src="../public/assets/js/menu.js" defer></script>
+        <script src="../public/assets/js/todolist.js" defer></script>
 
         <!-- Gold Particles -->
         <script>
