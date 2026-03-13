@@ -1,32 +1,50 @@
-# Ramadan Prayer Page 🌙
+# 🌙 Noor Ramadhan — Panduan Digital Bulan Suci
 
-Proyek web sederhana elegan untuk menampilkan doa-doa Ramadhan (Sahur dan Iftar) dengan desain modern, dan responsif
+**Noor Ramadhan** adalah platform web interaktif yang dirancang untuk menemani dan memperdalam pengalaman spiritual Anda selama bulan suci Ramadan. Dengan desain premium, animasi modern, dan fitur yang komprehensif, platform ini bertujuan untuk membantu umat Muslim mengelola ibadah harian dengan lebih khusyuk dan terorganisir.
 
-## 🚀 Cara Menjalankan Project
+## ✨ Fitur Utama
 
-### 1. Prasyarat
-Pastikan Anda sudah menginstal [Node.js](https://nodejs.org/) di komputer Anda.
+- **Jadwal Imsakiyah & Shalat**: Perhitungan waktu presisi untuk imsak, subuh, dan waktu shalat lainnya.
+- **Kitab Amal (Journaling)**: Jurnal harian interaktif untuk melacak konsistensi ibadah (Shalat, Puasa, Sedekah).
+- **Zikir Counter**: Tasbih digital elegan dengan penyimpanan riwayat otomatis.
+- **Kalkulator Zakat**: Penghitungan zakat maal dan fitrah yang akurat sesuai syariat.
+- **Doa & Niat**: Kumpulan doa mustajab dan niat ibadah sepanjang bulan Ramadan.
+- **Statistik Ibadah**: Visualisasi kemajuan spiritual Anda secara real-time.
 
-### 2. Instalasi Tailwind CSS
-Jika Anda belum menginstal dependensi, jalankan perintah berikut di terminal:
-```bash
-npm install -D tailwindcss
-```
+## 🛠️ Teknologi yang Digunakan
 
-### 3. Kompilasi Tailwind CSS
-Karena proyek ini sudah menyediakan *scripts* bawaan di dalam `package.json`, Anda tidak perlu mengetik perintah yang panjang. 
+- **HTML5**: Struktur semantik untuk aksesibilitas dan SEO.
+- **Tailwind CSS**: Framework CSS utility-first untuk desain UI premium dan responsif.
+- **JavaScript (Vanilla)**: Logika aplikasi, interaktivitas, dan animasi tanpa ketergantungan framework berat.
+- **Font Display (AwalRamadhan)**: Tipografi khas untuk nuansa Ramadan yang eksklusif.
 
-Untuk memproses file CSS sekali jalan (Build), jalankan:
+## 🚀 Cara Penggunaan
+
+### 1. Persiapan Lingkungan (Development)
+
+Pastikan Anda memiliki [Node.js](https://nodejs.org/) terinstall di sistem Anda.
+
+1. Clone atau download repository ini.
+2. Buka terminal di dalam folder projek.
+3. Install dependensi (jika diperlukan untuk compiler CSS):
+   ```bash
+   npm install
+   ```
+
+### 2. Menjalankan Projek
+
+Untuk melihat aplikasi di browser:
+- Anda bisa langsung membuka file `index.html` menggunakan browser, atau
+- Gunakan extension seperti **Live Server** di VS Code untuk pengalaman yang lebih mulus.
+
+### 3. Kompilasi CSS (Opsional)
+
+Jika Anda melakukan perubahan pada file `src/input.css` atau menambahkan class Tailwind baru, jalankan perintah berikut untuk melakukan rebuild:
 ```bash
 npm run build:css
 ```
-
-**Development Mode (Disarankan)**
-Agar Tailwind otomatis mendeteksi setiap kali Anda menyimpan file HTML/CSS dan langsung memperbarui `output.css`, biarkan proses ini berjalan di terminal:
+Atau gunakan mode `watch` agar otomatis rebuild saat ada perubahan:
 ```bash
 npm run watch:css
 ```
-
-### 4. Membuka Proyek
-Cukup buka file `index.html` langsung di browser Anda atau gunakan ekstensi **Live Server** di VS Code.
 

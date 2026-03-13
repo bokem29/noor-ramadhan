@@ -23,8 +23,10 @@
 <body
     class="bg-background text-body font-sans antialiased min-h-screen flex flex-col items-center w-full tracking-bodyTight relative z-0">
 
-
     <div class="fixed inset-0 pointer-events-none z-[-1] geo-pattern opacity-50"></div>
+    
+    <div data-scroll-container>
+        <div data-scroll-content>
     
     <main class="w-full flex flex-col items-center">
 
@@ -51,7 +53,7 @@
 
                 <h1 class="animate-fade-up delay-100 w-fit group" style="line-height: 0.85;">
                     <span class="font-display text-transparent text-[clamp(4.5rem,18vw,6.5rem)] sm:text-[7.5rem] md:text-9xl lg:text-[12rem] xl:text-[14rem] tracking-tight transition-all duration-700 ease-out group-hover:text-surface group-hover:drop-shadow-[0_0_30px_rgba(252,249,242,0.4)]" 
-                        style="-webkit-text-stroke: 3px #FCF9F2; text-stroke: 3px #FCF9F2;">
+                        style="-webkit-text-stroke: 3px #FCF9F2;">
                         Noor
                     </span>
                 </h1>
@@ -578,9 +580,9 @@ Spiritual Anda</h2>
                 
 
                 <a href="pages/doa.html"
-                    class="group relative inline-flex items-center justify-center gap-3 px-10 py-4 bg-transparent border-2 border-primary/20 text-primary rounded-full overflow-hidden transform active:scale-95 transition-all duration-500 hover:border-primary">
+                    class="group relative inline-flex items-center justify-center gap-3 px-10 py-4 bg-transparent border-2 border-accent text-primary rounded-full overflow-hidden transform active:scale-95 transition-all duration-500 hover:border-accent">
                     <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
-                        <div class="absolute left-1/2 bottom-0 w-[150%] aspect-square -translate-x-1/2 translate-y-1/2 bg-primary rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 ease-out z-0"></div>
+                        <div class="absolute left-1/2 bottom-0 w-[150%] aspect-square -translate-x-1/2 translate-y-1/2 bg-accent rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 ease-out z-0"></div>
                     </div>
                     <span class="relative z-10 font-sans text-xs uppercase tracking-[0.2em] font-bold group-hover:text-surface transition-colors duration-500">
                         Baca Doa
@@ -704,94 +706,92 @@ Spiritual Anda</h2>
                     <span>&copy;2026</span>
                 </div>
             </div>
-
         </div>
     </footer>
 
+    </div><!-- end data-scroll-content -->
+    </div><!-- end data-scroll-container -->
 
     <script src="./public/assets/js/menu.js" defer></script>
-
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // ── Reveal Animations & Intersection Observers ──
             const reveals = document.querySelectorAll('.reveal, .reveal-scale, .stagger-children');
-            const observer = new IntersectionObserver((entries) => {
+            const revealObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
                 });
             }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+            reveals.forEach(el => revealObserver.observe(el));
 
-            reveals.forEach(el => observer.observe(el));
-        });
-    </script>
+            // ── Smooth Marquee Deceleration ──
+            const marqueeTrack = document.querySelector('.marquee-track');
+            if (marqueeTrack) {
+                const updateMarqueeSpeed = (newDuration) => {
+                    const matrix = new WebKitCSSMatrix(window.getComputedStyle(marqueeTrack).transform);
+                    const halfWidth = marqueeTrack.offsetWidth / 2;
+                    const progress = (Math.abs(matrix.m41) % halfWidth) / halfWidth;
+                    
+                    marqueeTrack.style.animation = 'none';
+                    marqueeTrack.offsetHeight; 
+                    marqueeTrack.style.animation = `marquee ${newDuration}s linear infinite`;
+                    marqueeTrack.style.animationDelay = `${-progress * newDuration}s`;
+                };
+                marqueeTrack.addEventListener('mouseenter', () => updateMarqueeSpeed(120));
+                marqueeTrack.addEventListener('mouseleave', () => updateMarqueeSpeed(30));
+            }
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const cards = document.querySelectorAll('.portal-card-premium');
-            
-            cards.forEach(card => {
+            // ── Spotlight Effect ──
+            document.querySelectorAll('.portal-card-premium').forEach(card => {
                 card.addEventListener('mousemove', e => {
                     const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    
-                    // Update Spotlight Position
-                    card.style.setProperty('--x', `${x}px`);
-                    card.style.setProperty('--y', `${y}px`);
+                    card.style.setProperty('--x', `${e.clientX - rect.left}px`);
+                    card.style.setProperty('--y', `${e.clientY - rect.top}px`);
                 });
             });
-        });
-    </script>
-    
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
+            // ── Animated Counters ──
             const counters = document.querySelectorAll('.counter');
             const infinitySymbol = document.querySelector('.counter-infinity');
-            const speed = 200; // The lower the slower
+            const counterSpeed = 200;
 
             const animateCounters = () => {
                 counters.forEach(counter => {
-                    const updateCount = () => {
-                        const target = +counter.getAttribute('data-target');
-                        const count = +counter.innerText;
-                        
-                        // Calculate increment
-                        const inc = target / speed;
-
+                    const target = +counter.getAttribute('data-target');
+                    let count = 0;
+                    const increment = target / counterSpeed;
+                    
+                    const update = () => {
+                        count += increment;
                         if (count < target) {
-                            counter.innerText = Math.ceil(count + inc);
-                            setTimeout(updateCount, 20);
+                            counter.innerText = Math.ceil(count);
+                            requestAnimationFrame(update);
                         } else {
                             counter.innerText = target;
                         }
                     };
-                    updateCount();
+                    update();
                 });
                 
                 if (infinitySymbol) {
-                    setTimeout(() => {
-                        infinitySymbol.classList.remove('opacity-0');
-                        infinitySymbol.classList.add('opacity-100');
-                    }, 500);
+                    setTimeout(() => infinitySymbol.classList.replace('opacity-0', 'opacity-100'), 500);
                 }
             };
 
-            const observer = new IntersectionObserver((entries, observer) => {
+            const statsObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         animateCounters();
-                        observer.unobserve(entry.target); // Only animate once
+                        observer.unobserve(entry.target);
                     }
                 });
-            }, { threshold: 0.5 }); // Trigger when 50% of the section is visible
-
+            }, { threshold: 0.5 });
+            
             const statsSection = document.querySelector('.counter')?.closest('section');
-            if(statsSection) observer.observe(statsSection);
+            if(statsSection) statsObserver.observe(statsSection);
         });
     </script>
+    <script src="./public/assets/js/smooth-scroll.js" defer></script>
 </body>
 
 </html>
